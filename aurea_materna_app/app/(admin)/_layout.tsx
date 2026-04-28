@@ -25,7 +25,7 @@ export default function AdminLayout() {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textMuted,
         tabBarLabelStyle: { 
-          fontSize: 9, 
+          fontSize: 10, 
           fontWeight: '700',
           marginTop: 2,
         },
@@ -54,13 +54,6 @@ export default function AdminLayout() {
         options={{
           title: 'Devices',
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'hardware-chip' : 'hardware-chip-outline'} size={24} color={color} />
-        }}
-      />
-      <Tabs.Screen
-        name="reports"
-        options={{
-          title: 'Reports',
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={24} color={color} />
         }}
       />
       <Tabs.Screen
