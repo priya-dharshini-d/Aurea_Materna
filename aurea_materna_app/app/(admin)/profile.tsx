@@ -1,0 +1,140 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { Colors } from '../../constants/Colors';
+import { useRole } from '../_layout';
+
+export default function AdminProfile() {
+  const router = useRouter();
+  const { setRole } = useRole();
+  const [name, setName] = useState("Mr. Rajesh M.");
+  const [mobile, setMobile] = useState("+91 98765 33333");
+  const [district, setDistrict] = useState("Coimbatore Region");
+  
+  // Settings state
+  const [systemOfflineAlerts, setSystemOfflineAlerts] = useState(true);
+  const [supplyShortage, setSupplyShortage] = useState(true);
+  const [monthlyAnalytics, setMonthlyAnalytics] = useState(true);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Admin Profile</Text>
+        <View style={{ width: 24 }} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scroll}>
+        
+        {/* Profile Info */}
+        <View style={styles.profileSection}>
+          <TouchableOpacity style={styles.avatarContainer}>
+            <View style={styles.avatar}>
+              <Ionicons name="person" size={48} color={Colors.primary} />
+            </View>
+            <View style={styles.editBadge}>
+              <Ionicons name="pencil" size={14} color="white" />
+            </View>
+          </TouchableOpacity>
+          
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Full Name</Text>
+            <TextInput 
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholderTextColor={Colors.textMuted}
+            />
+          </View>
+          
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Mobile Number</Text>
+            <TextInput 
+              style={styles.input}
+              value={mobile}
+              onChangeText={setMobile}
+              keyboardType="phone-pad"
+              placeholderTextColor={Colors.textMuted}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>District / Region</Text>
+            <TextInput 
+              style={styles.input}
+              value={district}
+              onChangeText={setDistrict}
+              placeholderTextColor={Colors.textMuted}
+            />
+          </View>
+        </View>
+
+        {/* Settings Section */}
+        <View style={styles.settingsSection}>
+          <Text style={styles.sectionTitle}>System Notifications</Text>
+          
+          <View style={styles.card}>
+            <PrefRow label="System offline alerts" value={systemOfflineAlerts} onValueChange={setSystemOfflineAlerts} />
+            <PrefRow label="Critical supply shortages" value={supplyShortage} onValueChange={setSupplyShortage} />
+            <PrefRow label="Monthly analytics ready" value={monthlyAnalytics} onValueChange={setMonthlyAnalytics} isLast />
+          </View>
+
+          <TouchableOpacity 
+            style={styles.logoutBtn} 
+            onPress={() => {
+              setRole(null);
+              router.replace('/');
+            }}
+          >
+            <Text style={styles.logoutBtnText}>Log Out</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function PrefRow({ label, value, onValueChange, isLast }: any) {
+  return (
+    <View style={[styles.prefRow, !isLast && styles.borderBottom]}>
+      <Text style={styles.prefLabel}>{label}</Text>
+      <Switch 
+        value={value} 
+        onValueChange={onValueChange} 
+        trackColor={{ false: Colors.border, true: Colors.primary }}
+        thumbColor="white"
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.bg },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
+  backBtn: { padding: 4 },
+  headerTitle: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary },
+  scroll: { padding: 16, paddingBottom: 40 },
+  
+  profileSection: { alignItems: 'center', marginBottom: 32 },
+  avatarContainer: { position: 'relative', marginBottom: 24 },
+  avatar: { width: 100, height: 100, borderRadius: 50, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
+  editBadge: { position: 'absolute', bottom: 0, right: 0, backgroundColor: Colors.primary, width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: Colors.bg },
+  inputGroup: { width: '100%', marginBottom: 16 },
+  label: { fontSize: 13, color: Colors.textMuted, marginBottom: 6 },
+  input: { backgroundColor: 'white', color: Colors.textPrimary, borderRadius: 12, padding: 16, fontSize: 16, borderWidth: 1, borderColor: Colors.border },
+
+  settingsSection: { marginTop: 10 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary, marginBottom: 16 },
+  card: { backgroundColor: 'white', borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: Colors.border, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
+  
+  prefRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14 },
+  borderBottom: { borderBottomWidth: 1, borderBottomColor: Colors.border },
+  prefLabel: { fontSize: 14, color: Colors.textPrimary, fontWeight: '500' },
+  
+  logoutBtn: { width: '100%', padding: 16, borderRadius: 12, backgroundColor: Colors.dangerLight, alignItems: 'center', marginTop: 24, borderWidth: 1, borderColor: Colors.danger },
+  logoutBtnText: { color: Colors.danger, fontSize: 15, fontWeight: '700' }
+});

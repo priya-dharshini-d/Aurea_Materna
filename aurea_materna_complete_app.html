@@ -1,0 +1,1539 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue50:#E6F1FB;--blue100:#B5D4F4;--blue400:#378ADD;--blue600:#185FA5;--blue800:#0C447C;
+  --green50:#EAF3DE;--green400:#639922;--green600:#3B6D11;
+  --amber50:#FAEEDA;--amber400:#BA7517;--amber600:#854F0B;
+  --red50:#FCEBEB;--red400:#E24B4A;--red600:#A32D2D;
+  --teal50:#E1F5EE;--teal400:#1D9E75;--teal600:#0F6E56;
+  --purple50:#EEEDFE;--purple400:#7F77DD;--purple600:#534AB7;
+  --gray50:#F1EFE8;--gray200:#B4B2A9;--gray400:#888780;--gray600:#5F5E5A;
+  --bg:var(--color-background-primary,#fff);
+  --bg2:var(--color-background-secondary,#F7F7F5);
+  --bg3:var(--color-background-tertiary,#EFEDE8);
+  --text:var(--color-text-primary,#1a1a18);
+  --text2:var(--color-text-secondary,#5F5E5A);
+  --border:var(--color-border-tertiary,rgba(0,0,0,0.12));
+  --radius:12px;--radius-sm:8px;
+  --font:var(--font-sans,'Inter',sans-serif);
+}
+body{font-family:var(--font);background:var(--bg3);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ── NAV BAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:100}
+.topbar-title{font-size:17px;font-weight:500;color:var(--blue600)}
+.topbar-sub{font-size:11px;color:var(--text2);margin-top:1px}
+.role-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:10px 12px;background:var(--bg);border-bottom:0.5px solid var(--border)}
+.role-btn{padding:6px 14px;border-radius:20px;border:0.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.role-btn.active{background:var(--blue600);color:#fff;border-color:var(--blue600)}
+.screen-tabs{display:flex;gap:0;background:var(--bg);border-bottom:0.5px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.screen-tabs::-webkit-scrollbar{display:none}
+.stab{padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s}
+.stab.active{color:var(--blue600);border-bottom-color:var(--blue600);font-weight:500}
+
+/* ── LAYOUTS ── */
+.view{display:none;padding:14px;max-width:420px;margin:0 auto;min-height:70vh}
+.view.active{display:block}
+.card{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:14px;margin-bottom:12px}
+.card-sm{background:var(--bg);border-radius:var(--radius-sm);border:0.5px solid var(--border);padding:10px 12px;margin-bottom:8px}
+.row{display:flex;gap:10px;margin-bottom:12px}
+.col{flex:1}
+h3{font-size:14px;font-weight:500;color:var(--text);margin-bottom:10px}
+h4{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+p{color:var(--text2);font-size:13px;line-height:1.6}
+.label{font-size:11px;color:var(--text2)}
+.val{font-size:22px;font-weight:500;color:var(--text)}
+.val-sm{font-size:16px;font-weight:500;color:var(--text)}
+.unit{font-size:12px;color:var(--text2);margin-left:3px}
+
+/* ── STATUS CHIPS ── */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.chip-green{background:var(--green50);color:var(--green600)}
+.chip-amber{background:var(--amber50);color:var(--amber600)}
+.chip-red{background:var(--red50);color:var(--red600)}
+.chip-blue{background:var(--blue50);color:var(--blue600)}
+.dot{width:7px;height:7px;border-radius:50%}
+.dot-green{background:var(--green400)}
+.dot-amber{background:var(--amber400)}
+.dot-red{background:var(--red400)}
+
+/* ── BIG RISK CIRCLE ── */
+.risk-ring{width:160px;height:160px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;border:6px solid}
+.risk-ring.green{border-color:var(--green400);background:var(--green50)}
+.risk-ring.amber{border-color:var(--amber400);background:var(--amber50)}
+.risk-ring.red{border-color:var(--red400);background:var(--red50)}
+.risk-label{font-size:13px;font-weight:500;margin-top:4px}
+.risk-score{font-size:36px;font-weight:500}
+
+/* ── VITALS GRID ── */
+.vitals-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vital-card{background:var(--bg2);border-radius:var(--radius-sm);padding:12px;text-align:center;border:0.5px solid var(--border)}
+.vital-icon{font-size:18px;margin-bottom:4px}
+
+/* ── ALERT CARD ── */
+.alert-card{border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;border-left:4px solid}
+.alert-card.green{background:var(--green50);border-color:var(--green400)}
+.alert-card.amber{background:var(--amber50);border-color:var(--amber400)}
+.alert-card.red{background:var(--red50);border-color:var(--red400)}
+.alert-title{font-size:13px;font-weight:500;color:var(--text)}
+.alert-sub{font-size:12px;color:var(--text2);margin-top:3px}
+
+/* ── BUTTONS ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .2s;width:100%}
+.btn-primary{background:var(--blue600);color:#fff}
+.btn-primary:hover{background:var(--blue800)}
+.btn-outline{background:var(--bg);color:var(--text);border:0.5px solid var(--border)}
+.btn-outline:hover{background:var(--bg2)}
+.btn-red{background:var(--red400);color:#fff}
+.btn-green{background:var(--green400);color:#fff}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-row{display:flex;gap:8px;margin-bottom:10px}
+
+/* ── PROGRESS BAR ── */
+.prog{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden;margin:6px 0}
+.prog-fill{height:100%;border-radius:4px;transition:width .4s}
+
+/* ── TIMELINE ── */
+.timeline-item{display:flex;gap:12px;margin-bottom:12px}
+.tl-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.tl-line{width:2px;background:var(--border);margin-left:4px;margin-top:4px}
+.tl-content{flex:1}
+.tl-time{font-size:11px;color:var(--text2)}
+.tl-text{font-size:13px;color:var(--text)}
+
+/* ── MOTHER LIST ── */
+.mother-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0}
+.av-green{background:var(--green50);color:var(--green600)}
+.av-amber{background:var(--amber50);color:var(--amber600)}
+.av-red{background:var(--red50);color:var(--red600)}
+.mother-info{flex:1}
+.mother-name{font-size:13px;font-weight:500}
+.mother-sub{font-size:11px;color:var(--text2)}
+.risk-badge{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500}
+.rb-green{background:var(--green50);color:var(--green600)}
+.rb-amber{background:var(--amber50);color:var(--amber600)}
+.rb-red{background:var(--red50);color:var(--red600)}
+
+/* ── CHARTS CONTAINER ── */
+.chart-wrap{position:relative;height:160px;margin:10px 0}
+
+/* ── WELLNESS ── */
+.music-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--purple50);border-radius:var(--radius-sm);margin-bottom:8px;border:0.5px solid #AFA9EC55;cursor:pointer}
+.music-icon{width:42px;height:42px;border-radius:10px;background:var(--purple400);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.music-info{}
+.music-title{font-size:13px;font-weight:500;color:var(--purple600)}
+.music-sub{font-size:11px;color:var(--gray400)}
+
+/* ── TUTORIAL CARD ── */
+.tut-card{display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
+.tut-thumb{width:56px;height:56px;border-radius:8px;background:var(--blue50);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.tut-body{flex:1}
+.tut-title{font-size:13px;font-weight:500}
+.tut-meta{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* ── STAT CARDS (ADMIN) ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--bg);border-radius:var(--radius-sm);padding:12px;border:0.5px solid var(--border);text-align:center}
+.stat-num{font-size:28px;font-weight:500;color:var(--text)}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+.stat-delta{font-size:11px;font-weight:500;margin-top:4px}
+.delta-up{color:var(--green600)}
+.delta-down{color:var(--red600)}
+
+/* ── TOGGLE ── */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.toggle-label{font-size:13px}
+.toggle{width:40px;height:22px;background:#ccc;border-radius:11px;position:relative;cursor:pointer;transition:background .2s}
+.toggle.on{background:var(--blue600)}
+.toggle:after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s}
+.toggle.on:after{left:20px}
+
+/* ── EMERGENCY ── */
+.sos-btn{width:160px;height:160px;border-radius:50%;background:var(--red400);color:#fff;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-weight:500;margin:20px auto;cursor:pointer;gap:6px;box-shadow:0 0 0 12px var(--red50)}
+.sos-btn:hover{background:var(--red600)}
+
+/* ── WEEK TRACKER ── */
+.week-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;margin-bottom:12px}
+.week-row::-webkit-scrollbar{display:none}
+.week-dot{width:34px;height:34px;border-radius:50%;background:var(--bg2);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text2);flex-shrink:0;cursor:pointer}
+.week-dot.done{background:var(--blue600);color:#fff;border-color:var(--blue600)}
+.week-dot.current{background:var(--blue50);color:var(--blue600);border-color:var(--blue400);font-weight:500}
+
+/* ── OFFLINE BADGE ── */
+.offline-bar{background:var(--amber50);color:var(--amber600);font-size:11px;text-align:center;padding:5px;border-bottom:0.5px solid var(--amber400)}
+
+/* ── DEVICE CARD ── */
+.device-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
+.device-icon{width:44px;height:44px;border-radius:10px;background:var(--blue50);display:flex;align-items:center;justify-content:center;font-size:22px}
+.device-info{flex:1}
+.device-name{font-size:13px;font-weight:500}
+.device-sub{font-size:11px;color:var(--text2)}
+.device-status{font-size:11px;font-weight:500}
+.ds-active{color:var(--green600)}
+.ds-warn{color:var(--amber600)}
+
+/* ── SCROLLABLE AREA ── */
+.scroll-content{max-height:600px;overflow-y:auto;scrollbar-width:thin}
+
+/* ── HEATMAP-STYLE ── */
+.heatmap-row{display:flex;gap:4px;margin-bottom:4px;align-items:center}
+.heatmap-lbl{width:60px;font-size:10px;color:var(--text2);text-align:right;padding-right:6px}
+.heatmap-cell{flex:1;height:22px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500}
+
+/* ── WAVEFORM MINI ── */
+.wave-container{height:40px;width:100%;overflow:hidden}
+svg.wave{width:100%;height:40px}
+
+/* ── FAMILY CARD ── */
+.family-card{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.fam-avatar{width:36px;height:36px;border-radius:50%;background:var(--teal50);color:var(--teal600);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500}
+
+/* ── WEEKLY GUIDE ── */
+.tip-pill{display:inline-block;padding:4px 10px;background:var(--blue50);color:var(--blue600);border-radius:12px;font-size:11px;margin:3px 3px 3px 0}
+
+/* ── DOCTOR WEB ── */
+.web-view{display:none;padding:14px;max-width:680px;margin:0 auto}
+.web-view.active{display:block}
+.web-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.web-title{font-size:18px;font-weight:500}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.patient-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);cursor:pointer}
+.patient-row:hover{background:var(--bg2);margin:0 -14px;padding:10px 14px}
+
+/* ── ANIMATIONS ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.blink{animation:blink 1s ease-in-out infinite}
+
+/* ── CONNECTIVITY ── */
+.conn-icons{display:flex;gap:8px;align-items:center}
+.conn-icon{width:28px;height:28px;border-radius:6px;background:var(--green50);border:0.5px solid var(--green400);display:flex;align-items:center;justify-content:center;font-size:13px}
+.conn-icon.off{background:var(--gray50);border-color:var(--gray200);opacity:0.5}
+
+/* ── VOICE BTN ── */
+.voice-btn{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal50);border:0.5px solid var(--teal400);border-radius:var(--radius);cursor:pointer;margin-bottom:12px}
+.voice-orb{width:36px;height:36px;border-radius:50%;background:var(--teal400);display:flex;align-items:center;justify-content:center;font-size:16px}
+.voice-text{font-size:13px;font-weight:500;color:var(--teal600)}
+.voice-sub{font-size:11px;color:var(--teal400)}
+
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Aurea Materna</div>
+    <div class="topbar-sub">Smart Maternal Health System</div>
+  </div>
+  <div class="conn-icons">
+    <div class="conn-icon" title="BLE">🔵</div>
+    <div class="conn-icon" title="LoRa">📡</div>
+    <div class="conn-icon off" title="Cellular">📶</div>
+  </div>
+</div>
+
+<!-- ROLE SELECTOR -->
+<div class="role-tabs">
+  <button class="role-btn active" onclick="switchRole('mother')">Mother App</button>
+  <button class="role-btn" onclick="switchRole('asha')">ASHA Worker</button>
+  <button class="role-btn" onclick="switchRole('doctor')">Doctor PHC</button>
+  <button class="role-btn" onclick="switchRole('admin')">Gov Admin</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MOTHER ROLE
+════════════════════════════════════════════ -->
+<div id="role-mother">
+  <div class="screen-tabs" id="mother-tabs">
+    <div class="stab active" onclick="switchScreen('mother','home')">Home</div>
+    <div class="stab" onclick="switchScreen('mother','vitals')">Vitals</div>
+    <div class="stab" onclick="switchScreen('mother','alerts')">Alerts</div>
+    <div class="stab" onclick="switchScreen('mother','tutorials')">Learn</div>
+    <div class="stab" onclick="switchScreen('mother','wellness')">Wellness</div>
+    <div class="stab" onclick="switchScreen('mother','weekly')">Weekly</div>
+    <div class="stab" onclick="switchScreen('mother','emergency')">SOS</div>
+    <div class="stab" onclick="switchScreen('mother','family')">Family</div>
+  </div>
+
+  <!-- HOME -->
+  <div class="view active" id="mother-home">
+    <div class="offline-bar">Offline mode active — data synced via BLE patch</div>
+
+    <!-- Voice Guidance -->
+    <div class="voice-btn" style="margin-top:14px">
+      <div class="voice-orb">🎙️</div>
+      <div>
+        <div class="voice-text">All is well today, Priya</div>
+        <div class="voice-sub">Tap to hear full guidance in Tamil</div>
+      </div>
+    </div>
+
+    <!-- Risk Circle -->
+    <div class="risk-ring green pulse">
+      <div style="font-size:32px">🌿</div>
+      <div class="risk-score" style="color:var(--green600)">82</div>
+      <div class="risk-label" style="color:var(--green600)">Normal</div>
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--text2);margin-bottom:16px">Placental Perfusion Risk Score · Updated 4 min ago</p>
+
+    <!-- Quick Vitals Grid -->
+    <div class="vitals-grid">
+      <div class="vital-card">
+        <div class="vital-icon">❤️</div>
+        <div class="val-sm">84</div><span class="unit">bpm</span>
+        <div class="label">Heart Rate</div>
+      </div>
+      <div class="vital-card">
+        <div class="vital-icon">🩸</div>
+        <div class="val-sm">118/76</div>
+        <div class="label">Blood Pressure</div>
+      </div>
+      <div class="vital-card">
+        <div class="vital-icon">🫁</div>
+        <div class="val-sm">98%</div><span class="unit">SpO₂</span>
+        <div class="label">Oxygen Saturation</div>
+      </div>
+      <div class="vital-card">
+        <div class="vital-icon">🌡️</div>
+        <div class="val-sm">36.8°</div><span class="unit">C</span>
+        <div class="label">Temperature</div>
+      </div>
+    </div>
+
+    <!-- Uterine Activity -->
+    <div class="card" style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h3 style="margin:0">Uterine Activity</h3>
+        <span class="chip chip-green"><span class="dot dot-green"></span>Low</span>
+      </div>
+      <div class="wave-container">
+        <svg class="wave" viewBox="0 0 300 40" preserveAspectRatio="none">
+          <polyline points="0,20 10,18 20,22 30,15 40,25 50,20 60,18 70,22 80,19 90,21 100,17 110,23 120,20 130,19 140,21 150,18 160,22 170,20 180,17 190,23 200,20 210,19 220,21 230,18 240,22 250,20 260,19 270,21 280,18 290,22 300,20"
+            fill="none" stroke="var(--teal400)" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="label" style="text-align:center">Abdominal EMG · 2 contractions in last hour</div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="switchScreen('mother','tutorials')">🎓 Learn</button>
+      <button class="btn btn-outline" onclick="switchScreen('mother','wellness')">🎵 Relax</button>
+    </div>
+    <button class="btn btn-primary" onclick="switchScreen('mother','vitals')">📊 View Full Vitals</button>
+  </div>
+
+  <!-- VITALS DETAIL -->
+  <div class="view" id="mother-vitals">
+    <div class="card" style="margin-top:14px">
+      <h3>Live Readings</h3>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div class="label">Heart Rate (bpm)</div>
+          <div class="chip chip-green">Normal</div>
+        </div>
+        <div class="val">84 <span class="unit">bpm</span></div>
+        <div class="prog"><div class="prog-fill" style="width:56%;background:var(--green400)"></div></div>
+        <div class="label">Range: 60–100 bpm</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div class="label">Blood Pressure</div>
+          <div class="chip chip-green">Normal</div>
+        </div>
+        <div class="val">118/76 <span class="unit">mmHg</span></div>
+        <div class="prog"><div class="prog-fill" style="width:62%;background:var(--green400)"></div></div>
+        <div class="label">Target: below 140/90</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div class="label">SpO₂</div>
+          <div class="chip chip-green">Excellent</div>
+        </div>
+        <div class="val">98 <span class="unit">%</span></div>
+        <div class="prog"><div class="prog-fill" style="width:90%;background:var(--blue400)"></div></div>
+        <div class="label">Normal: above 95%</div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div class="label">Body Temperature</div>
+          <div class="chip chip-green">Normal</div>
+        </div>
+        <div class="val">36.8 <span class="unit">°C</span></div>
+        <div class="prog"><div class="prog-fill" style="width:68%;background:var(--amber400)"></div></div>
+        <div class="label">Normal: 36.1–37.2 °C</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Placental Perfusion Index</h3>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--green50);border:4px solid var(--green400);display:flex;align-items:center;justify-content:center;flex-direction:column">
+          <div style="font-size:22px;font-weight:500;color:var(--green600)">82</div>
+          <div style="font-size:9px;color:var(--green600)">PPRS</div>
+        </div>
+        <div style="flex:1">
+          <p>Near-infrared spectroscopy via abdominal patch. Placental oxygen delivery is adequate.</p>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <span class="chip chip-green" style="font-size:10px">PlGF ✓</span>
+            <span class="chip chip-green" style="font-size:10px">uPI ✓</span>
+            <span class="chip chip-green" style="font-size:10px">RI ✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Fetal Movement Activity</h3>
+      <div class="wave-container" style="height:50px">
+        <svg viewBox="0 0 300 50" width="100%" height="50" preserveAspectRatio="none">
+          <rect x="20" y="30" width="6" height="18" rx="2" fill="var(--blue400)" opacity="0.7"/>
+          <rect x="50" y="22" width="6" height="26" rx="2" fill="var(--blue400)"/>
+          <rect x="90" y="28" width="6" height="20" rx="2" fill="var(--blue400)" opacity="0.8"/>
+          <rect x="140" y="18" width="6" height="30" rx="2" fill="var(--blue600)"/>
+          <rect x="180" y="26" width="6" height="22" rx="2" fill="var(--blue400)" opacity="0.7"/>
+          <rect x="220" y="20" width="6" height="28" rx="2" fill="var(--blue400)"/>
+          <rect x="260" y="30" width="6" height="18" rx="2" fill="var(--blue400)" opacity="0.6"/>
+        </svg>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        <span class="label">12 movements today</span>
+        <span class="chip chip-green">Active ✓</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>24-Hour Trend</h3>
+      <div class="chart-wrap">
+        <canvas id="trendChart" role="img" aria-label="24 hour heart rate trend chart">Heart rate varies from 78 to 92 over 24 hours.</canvas>
+      </div>
+    </div>
+
+    <div style="background:var(--blue50);border-radius:var(--radius-sm);padding:12px;border:0.5px solid var(--blue100)">
+      <div style="font-size:12px;font-weight:500;color:var(--blue600);margin-bottom:4px">TinyML On-Device Analysis</div>
+      <p style="font-size:12px">AI model running on patch. Personalised baseline established over 14 days. No cloud needed for risk prediction.</p>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="view" id="mother-alerts">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Health Alerts</h3>
+
+      <div class="alert-card green">
+        <div class="alert-title">All vitals normal</div>
+        <div class="alert-sub">Today 6:00 AM · Patch confirmed normal readings</div>
+      </div>
+      <div class="alert-card amber">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="alert-title">Blood pressure slightly elevated</div>
+            <div class="alert-sub">Yesterday 2:30 PM · 132/88 mmHg detected</div>
+          </div>
+          <span class="chip chip-amber" style="margin-left:8px;flex-shrink:0">Attention</span>
+        </div>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="switchScreen('mother','tutorials')">What should I do?</button>
+      </div>
+      <div class="alert-card green">
+        <div class="alert-title">Fetal movement confirmed</div>
+        <div class="alert-sub">Yesterday 10:00 AM · 10 kicks in 2 hours ✓</div>
+      </div>
+      <div class="alert-card amber">
+        <div class="alert-title">Medication reminder</div>
+        <div class="alert-sub">Take iron + folic acid with lunch</div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-green btn-sm" style="flex:1">Taken ✓</button>
+          <button class="btn btn-outline btn-sm" style="flex:1">Remind later</button>
+        </div>
+      </div>
+
+      <h3 style="margin-top:16px;margin-bottom:10px">ASHA Worker Assigned</h3>
+      <div class="card-sm" style="display:flex;align-items:center;gap:12px">
+        <div class="avatar av-green">🧑‍⚕️</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Meena Devi (ASHA)</div>
+          <div style="font-size:11px;color:var(--text2)">Reviewing your last reading now</div>
+        </div>
+        <button class="btn btn-primary btn-sm" style="width:auto;padding:7px 12px">Call</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TUTORIALS -->
+  <div class="view" id="mother-tutorials">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Learning Centre</h3>
+      <div style="display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none">
+        <span class="chip chip-blue" style="white-space:nowrap;cursor:pointer">All</span>
+        <span class="chip" style="background:var(--bg2);white-space:nowrap;cursor:pointer">Pregnancy Care</span>
+        <span class="chip" style="background:var(--bg2);white-space:nowrap;cursor:pointer">Diet & Nutrition</span>
+        <span class="chip" style="background:var(--bg2);white-space:nowrap;cursor:pointer">Warning Signs</span>
+        <span class="chip" style="background:var(--bg2);white-space:nowrap;cursor:pointer">Delivery Prep</span>
+      </div>
+
+      <div style="background:var(--green50);border-radius:var(--radius-sm);padding:10px;border:0.5px solid var(--green400);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:16px">🌐</span>
+        <span style="font-size:12px;color:var(--green600)">All content available offline in Tamil, Telugu, Hindi</span>
+      </div>
+
+      <div class="tut-card">
+        <div class="tut-thumb">🤰</div>
+        <div class="tut-body">
+          <div class="tut-title">Managing high blood pressure</div>
+          <div class="tut-meta">🎬 Video · 4 min · Tamil · ⭐ 4.9</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:75%;background:var(--blue400)"></div></div>
+          <div class="label">75% complete</div>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-thumb">🥗</div>
+        <div class="tut-body">
+          <div class="tut-title">Iron-rich foods during pregnancy</div>
+          <div class="tut-meta">🔊 Audio · 6 min · Hindi · ⭐ 4.8</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:0%;background:var(--blue400)"></div></div>
+          <div class="label">Not started</div>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-thumb">⚠️</div>
+        <div class="tut-body">
+          <div class="tut-title">Warning signs to watch for</div>
+          <div class="tut-meta">🖼️ Images + Audio · 8 min · Tamil</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:100%;background:var(--green400)"></div></div>
+          <div class="label" style="color:var(--green600)">Completed ✓</div>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-thumb">🧘</div>
+        <div class="tut-body">
+          <div class="tut-title">Breathing exercises for third trimester</div>
+          <div class="tut-meta">🎬 Video · 10 min · Telugu · ⭐ 4.7</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:30%;background:var(--blue400)"></div></div>
+          <div class="label">30% complete</div>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-thumb">🏥</div>
+        <div class="tut-body">
+          <div class="tut-title">When to go to the hospital</div>
+          <div class="tut-meta">🔊 Audio · 5 min · Tamil · ⭐ 5.0</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:0%;background:var(--blue400)"></div></div>
+          <div class="label">Not started</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WELLNESS -->
+  <div class="view" id="mother-wellness">
+    <div style="margin-top:14px">
+      <div style="background:var(--purple50);border-radius:var(--radius);padding:14px;margin-bottom:14px;border:0.5px solid #AFA9EC55">
+        <div style="font-size:13px;font-weight:500;color:var(--purple600);margin-bottom:4px">Emotional Wellness</div>
+        <p style="font-size:12px;color:var(--purple400)">Your stress level today: <strong>Low</strong> · Music auto-paused</p>
+      </div>
+
+      <h3 style="margin-bottom:10px">Relaxation Music</h3>
+      <div class="music-card">
+        <div class="music-icon">🎵</div>
+        <div class="music-info">
+          <div class="music-title">Carnatic Lullabies</div>
+          <div class="music-sub">Baby bonding · 24 min · Offline</div>
+        </div>
+        <button class="btn btn-primary btn-sm" style="width:auto;padding:7px 14px">▶ Play</button>
+      </div>
+      <div class="music-card">
+        <div class="music-icon">🌊</div>
+        <div class="music-info">
+          <div class="music-title">Nature Sounds</div>
+          <div class="music-sub">Stress relief · 30 min · Offline</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="width:auto;padding:7px 14px">▶ Play</button>
+      </div>
+      <div class="music-card">
+        <div class="music-icon">🧘</div>
+        <div class="music-info">
+          <div class="music-title">Guided Meditation</div>
+          <div class="music-sub">15 min Tamil · Breathing focus</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="width:auto;padding:7px 14px">▶ Play</button>
+      </div>
+
+      <h3 style="margin-top:16px;margin-bottom:10px">Mood Tracker</h3>
+      <div class="card-sm">
+        <div class="label" style="margin-bottom:8px">How are you feeling today?</div>
+        <div style="display:flex;gap:10px;justify-content:space-around">
+          <div style="text-align:center;cursor:pointer">
+            <div style="font-size:26px">😊</div>
+            <div class="label">Happy</div>
+          </div>
+          <div style="text-align:center;cursor:pointer">
+            <div style="font-size:26px">😐</div>
+            <div class="label">Okay</div>
+          </div>
+          <div style="text-align:center;cursor:pointer">
+            <div style="font-size:26px">😢</div>
+            <div class="label">Sad</div>
+          </div>
+          <div style="text-align:center;cursor:pointer">
+            <div style="font-size:26px">😰</div>
+            <div class="label">Anxious</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--teal50);border-radius:var(--radius-sm);padding:12px;border:0.5px solid var(--teal400);margin-top:10px">
+        <div style="font-size:12px;font-weight:500;color:var(--teal600)">AI Wellness Note</div>
+        <p style="font-size:12px;margin-top:4px">Your stress (HRV) was slightly elevated yesterday evening. Consider 10 min of deep breathing before sleep.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY GUIDE -->
+  <div class="view" id="mother-weekly">
+    <div style="margin-top:14px">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 style="margin:0">Pregnancy Journey</h3>
+          <span class="chip chip-blue">Week 24</span>
+        </div>
+        <div class="week-row">
+          <div class="week-dot done">1</div><div class="week-dot done">4</div>
+          <div class="week-dot done">8</div><div class="week-dot done">12</div>
+          <div class="week-dot done">16</div><div class="week-dot done">20</div>
+          <div class="week-dot current">24</div><div class="week-dot">28</div>
+          <div class="week-dot">32</div><div class="week-dot">36</div>
+          <div class="week-dot">40</div>
+        </div>
+        <div class="prog"><div class="prog-fill" style="width:60%;background:var(--blue400)"></div></div>
+        <div class="label" style="text-align:center;margin-top:4px">16 weeks remaining</div>
+      </div>
+
+      <div class="card">
+        <h3>Baby this week</h3>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:48px">🌽</div>
+          <div>
+            <div class="val-sm">30 cm · 600 g</div>
+            <p style="font-size:12px;margin-top:4px">About the size of corn. Baby's face is fully formed, lungs developing rapidly.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>This week's tips</h3>
+        <div style="margin-bottom:10px">
+          <h4>Diet</h4>
+          <span class="tip-pill">Iron-rich leafy greens</span>
+          <span class="tip-pill">Calcium from dairy</span>
+          <span class="tip-pill">Protein 70g/day</span>
+        </div>
+        <div style="margin-bottom:10px">
+          <h4>Exercise</h4>
+          <span class="tip-pill">20 min walk daily</span>
+          <span class="tip-pill">Pelvic floor exercises</span>
+        </div>
+        <div>
+          <h4>Watch for</h4>
+          <span class="tip-pill" style="background:var(--amber50);color:var(--amber600)">Swelling of feet</span>
+          <span class="tip-pill" style="background:var(--amber50);color:var(--amber600)">Vision changes</span>
+          <span class="tip-pill" style="background:var(--amber50);color:var(--amber600)">Severe headache</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Upcoming checkup</h3>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:32px">📅</div>
+          <div>
+            <div style="font-size:13px;font-weight:500">Glucose tolerance test</div>
+            <div class="label">In 4 days · PHC Coimbatore</div>
+            <button class="btn btn-primary btn-sm" style="margin-top:8px;width:auto;padding:7px 14px">Get directions</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMERGENCY -->
+  <div class="view" id="mother-emergency">
+    <div style="text-align:center;margin-top:20px">
+      <div style="font-size:14px;color:var(--text2);margin-bottom:8px">Press if you feel unwell</div>
+      <button class="sos-btn" onclick="alert('Emergency alert sent to ASHA Meena Devi and PHC Doctor!')">
+        <span style="font-size:28px">🆘</span>
+        <span>EMERGENCY</span>
+        <span style="font-size:11px;opacity:0.8">CALL FOR HELP</span>
+      </button>
+      <div style="font-size:12px;color:var(--text2);margin-top:10px">Alert sent via SMS if no internet</div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <h3>Emergency contacts</h3>
+      <div class="family-card">
+        <div class="fam-avatar">🧑‍⚕️</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Meena Devi (ASHA)</div>
+          <div style="font-size:11px;color:var(--text2)">Nearest health worker</div>
+        </div>
+        <button class="btn btn-primary btn-sm" style="width:auto">Call</button>
+      </div>
+      <div class="family-card">
+        <div class="fam-avatar" style="background:var(--blue50);color:var(--blue600)">🏥</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">PHC Coimbatore</div>
+          <div style="font-size:11px;color:var(--text2)">8 km away</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="width:auto">Call</button>
+      </div>
+      <div class="family-card" style="border:0">
+        <div class="fam-avatar" style="background:var(--teal50);color:var(--teal600)">👨</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Ravi (Husband)</div>
+          <div style="font-size:11px;color:var(--text2)">Family contact</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="width:auto">Call</button>
+      </div>
+    </div>
+
+    <div style="background:var(--amber50);border-radius:var(--radius-sm);padding:12px;border:0.5px solid var(--amber400)">
+      <div style="font-size:12px;font-weight:500;color:var(--amber600)">Warning Signs — Seek help immediately if:</div>
+      <ul style="font-size:12px;color:var(--amber600);margin-top:6px;padding-left:16px">
+        <li>Severe headache or blurred vision</li>
+        <li>Heavy bleeding</li>
+        <li>Baby not moving for 12 hours</li>
+        <li>Sudden severe swelling</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FAMILY -->
+  <div class="view" id="mother-family">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Family Connect</h3>
+      <div class="card">
+        <h3>Linked Family Members</h3>
+        <div class="family-card">
+          <div class="fam-avatar">👨</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">Ravi Kumar (Husband)</div>
+            <div style="font-size:11px;color:var(--text2)">Gets daily summary alerts</div>
+          </div>
+          <span class="chip chip-green">Active</span>
+        </div>
+        <div class="family-card">
+          <div class="fam-avatar" style="background:var(--amber50);color:var(--amber600)">👩‍🦳</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">Kamala (Mother-in-law)</div>
+            <div style="font-size:11px;color:var(--text2)">Emergency alerts only</div>
+          </div>
+          <span class="chip chip-green">Active</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Alert Preferences</h3>
+        <div class="toggle-wrap">
+          <span class="toggle-label">Daily health summary</span>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-wrap">
+          <span class="toggle-label">Emergency alerts (auto)</span>
+          <div class="toggle on"></div>
+        </div>
+        <div class="toggle-wrap">
+          <span class="toggle-label">Red alert calls</span>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-wrap" style="border:0">
+          <span class="toggle-label">Doctor appointment reminder</span>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-outline" style="margin-top:4px">+ Add family member</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     ASHA WORKER ROLE
+════════════════════════════════════════════ -->
+<div id="role-asha" style="display:none">
+  <div class="screen-tabs" id="asha-tabs">
+    <div class="stab active" onclick="switchScreen('asha','dashboard')">Dashboard</div>
+    <div class="stab" onclick="switchScreen('asha','mothers')">My Mothers</div>
+    <div class="stab" onclick="switchScreen('asha','alerts')">Alerts</div>
+    <div class="stab" onclick="switchScreen('asha','training')">Training</div>
+    <div class="stab" onclick="switchScreen('asha','sync')">Sync</div>
+  </div>
+
+  <div class="view active" id="asha-dashboard">
+    <div style="margin-top:14px">
+      <div class="card" style="background:var(--blue600);border:none">
+        <div style="color:rgba(255,255,255,0.7);font-size:12px">ASHA Worker</div>
+        <div style="color:#fff;font-size:18px;font-weight:500;margin-top:2px">Meena Devi</div>
+        <div style="color:rgba(255,255,255,0.8);font-size:12px">Panchayat Karamadai · 18 mothers assigned</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:10px;flex:1;text-align:center">
+            <div style="font-size:22px;font-weight:500;color:#fff">14</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7)">Green</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:10px;flex:1;text-align:center">
+            <div style="font-size:22px;font-weight:500;color:#FAC775">3</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7)">Amber</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.15);border-radius:8px;padding:10px;flex:1;text-align:center">
+            <div style="font-size:22px;font-weight:500;color:#F09595">1</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7)">Red</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:10px">Priority Attention</h3>
+
+      <div class="alert-card red">
+        <div style="display:flex;justify-content:space-between">
+          <div>
+            <div class="alert-title blink">🔴 Lakshmi P. — BP 148/94</div>
+            <div class="alert-sub">Week 32 · PPRS dropped to 45 — HIGH RISK</div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:10px;margin-bottom:0">
+          <button class="btn btn-red btn-sm" style="flex:1">Call Now</button>
+          <button class="btn btn-outline btn-sm" style="flex:1">View Detail</button>
+        </div>
+      </div>
+      <div class="alert-card amber">
+        <div class="alert-title">⚠️ Gomathi S. — Missed medication</div>
+        <div class="alert-sub">Week 28 · Iron supplement skipped 2 days</div>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px">Send reminder</button>
+      </div>
+      <div class="alert-card amber">
+        <div class="alert-title">⚠️ Devi R. — Low fetal movement</div>
+        <div class="alert-sub">Week 36 · 4 movements in 12 hours (normal: 10+)</div>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px">Contact</button>
+      </div>
+
+      <h3 style="margin-top:16px;margin-bottom:10px">Today's Visit Schedule</h3>
+      <div class="timeline-item">
+        <div>
+          <div class="tl-dot" style="background:var(--green400)"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-time">9:00 AM ✓ Done</div>
+          <div class="tl-text">Priya K. — Routine check</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div>
+          <div class="tl-dot" style="background:var(--red400)"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-time">11:00 AM — NOW</div>
+          <div class="tl-text">Lakshmi P. — Urgent BP check</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div>
+          <div class="tl-dot" style="background:var(--gray200)"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-time">2:00 PM</div>
+          <div class="tl-text">Gomathi S. — Device re-pairing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="asha-mothers">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:2px">All Assigned Mothers</h3>
+      <p style="margin-bottom:12px">18 women · 1 red · 3 amber · 14 green</p>
+
+      <div class="mother-row">
+        <div class="avatar av-red">LP</div>
+        <div class="mother-info">
+          <div class="mother-name">Lakshmi P.</div>
+          <div class="mother-sub">32 weeks · PPRS 45</div>
+        </div>
+        <span class="risk-badge rb-red">High Risk</span>
+      </div>
+      <div class="mother-row">
+        <div class="avatar av-amber">GS</div>
+        <div class="mother-info">
+          <div class="mother-name">Gomathi S.</div>
+          <div class="mother-sub">28 weeks · PPRS 62</div>
+        </div>
+        <span class="risk-badge rb-amber">Watch</span>
+      </div>
+      <div class="mother-row">
+        <div class="avatar av-amber">DR</div>
+        <div class="mother-info">
+          <div class="mother-name">Devi R.</div>
+          <div class="mother-sub">36 weeks · PPRS 67</div>
+        </div>
+        <span class="risk-badge rb-amber">Watch</span>
+      </div>
+      <div class="mother-row">
+        <div class="avatar av-green">PK</div>
+        <div class="mother-info">
+          <div class="mother-name">Priya K.</div>
+          <div class="mother-sub">24 weeks · PPRS 82</div>
+        </div>
+        <span class="risk-badge rb-green">Normal</span>
+      </div>
+      <div class="mother-row">
+        <div class="avatar av-green">SM</div>
+        <div class="mother-info">
+          <div class="mother-name">Suganya M.</div>
+          <div class="mother-sub">20 weeks · PPRS 88</div>
+        </div>
+        <span class="risk-badge rb-green">Normal</span>
+      </div>
+      <div class="mother-row" style="border:0">
+        <div class="avatar av-green">RV</div>
+        <div class="mother-info">
+          <div class="mother-name">Revathi V.</div>
+          <div class="mother-sub">16 weeks · PPRS 91</div>
+        </div>
+        <span class="risk-badge rb-green">Normal</span>
+      </div>
+      <p style="text-align:center;color:var(--text2);font-size:12px;margin-top:8px">+ 12 more mothers</p>
+    </div>
+  </div>
+
+  <div class="view" id="asha-alerts">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Alert Feed</h3>
+      <div class="alert-card red">
+        <div class="alert-title blink">🔴 URGENT — Lakshmi P.</div>
+        <div class="alert-sub">BP: 148/94 · PPRS: 45 · Week 32 · Preeclampsia risk HIGH</div>
+        <div style="margin-top:8px;font-size:12px;background:var(--bg);padding:8px;border-radius:6px">
+          <strong>AI Recommendation:</strong> Refer to PHC immediately. Begin BP monitoring every 2 hours.
+        </div>
+        <div class="btn-row" style="margin-top:10px;margin-bottom:0">
+          <button class="btn btn-red btn-sm" style="flex:1">Call Lakshmi</button>
+          <button class="btn btn-outline btn-sm" style="flex:1">Escalate to Doctor</button>
+        </div>
+      </div>
+      <div class="alert-card amber">
+        <div class="alert-title">⚠️ Gomathi S. — Adherence low</div>
+        <div class="alert-sub">Missed 2 iron supplements this week · Weight gain below expected</div>
+      </div>
+      <div class="alert-card green">
+        <div class="alert-title">✅ Priya K. — Normal check complete</div>
+        <div class="alert-sub">All vitals within range · No action needed</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="asha-training">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">ASHA Training Modules</h3>
+      <div class="tut-card">
+        <div class="tut-thumb">📱</div>
+        <div class="tut-body">
+          <div class="tut-title">How to pair the abdominal patch</div>
+          <div class="tut-meta">🎬 Video · 8 min · Tamil</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:100%;background:var(--green400)"></div></div>
+          <div class="label" style="color:var(--green600)">Certified ✓</div>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-thumb">📊</div>
+        <div class="tut-body">
+          <div class="tut-title">Reading risk scores and alerts</div>
+          <div class="tut-meta">🔊 Audio + Quiz · 12 min</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:60%;background:var(--blue400)"></div></div>
+          <div class="label">60% complete</div>
+        </div>
+      </div>
+      <div class="tut-card">
+        <div class="tut-thumb">🚑</div>
+        <div class="tut-body">
+          <div class="tut-title">Emergency escalation protocol</div>
+          <div class="tut-meta">🎬 Video · 15 min · Critical</div>
+          <div class="prog" style="margin-top:6px"><div class="prog-fill" style="width:0%;background:var(--blue400)"></div></div>
+          <div class="label">Not started</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="asha-sync">
+    <div style="margin-top:14px">
+      <div class="card">
+        <h3>Connectivity Status</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="chip chip-green">BLE Active</span>
+          <span class="chip chip-green">LoRa Active</span>
+          <span class="chip chip-amber">Cellular Weak</span>
+          <span class="chip" style="background:var(--bg2)">WiFi Offline</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2)">Last cloud sync: 47 min ago via LoRa gateway</div>
+        <div class="prog" style="margin-top:8px"><div class="prog-fill" style="width:82%;background:var(--blue400)"></div></div>
+        <div class="label">18 of 18 devices synced today</div>
+      </div>
+      <div class="card">
+        <h3>SMS Fallback Log</h3>
+        <div class="timeline-item">
+          <div><div class="tl-dot" style="background:var(--amber400)"></div></div>
+          <div class="tl-content">
+            <div class="tl-time">10:23 AM</div>
+            <div class="tl-text">Alert SMS sent to Dr. Ramesh for Lakshmi P.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div><div class="tl-dot" style="background:var(--green400)"></div></div>
+          <div class="tl-content">
+            <div class="tl-time">8:00 AM</div>
+            <div class="tl-text">Daily summary sent via SMS to 3 doctors</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     DOCTOR / PHC DASHBOARD (WEB-STYLE)
+════════════════════════════════════════════ -->
+<div id="role-doctor" style="display:none">
+  <div class="screen-tabs" id="doctor-tabs">
+    <div class="stab active" onclick="switchScreen('doctor','overview')">Overview</div>
+    <div class="stab" onclick="switchScreen('doctor','patients')">Patients</div>
+    <div class="stab" onclick="switchScreen('doctor','alerts')">Alerts</div>
+    <div class="stab" onclick="switchScreen('doctor','analytics')">Analytics</div>
+    <div class="stab" onclick="switchScreen('doctor','telemedicine')">Teleconsult</div>
+  </div>
+
+  <div class="web-view active" id="doctor-overview">
+    <div class="web-header" style="margin-top:14px">
+      <div>
+        <div class="web-title">PHC Coimbatore</div>
+        <div class="label">Dr. S. Ramesh · Obstetrics</div>
+      </div>
+      <span class="chip chip-red blink">1 Emergency</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="stat-num">47</div>
+        <div class="stat-lbl">Active patients</div>
+        <div class="stat-delta delta-up">+3 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--red400)">1</div>
+        <div class="stat-lbl">High risk (red)</div>
+        <div class="stat-delta delta-down">Needs review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--amber400)">8</div>
+        <div class="stat-lbl">Watch (amber)</div>
+        <div class="stat-delta">Monitoring</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin:0">Risk Distribution Today</h3>
+        <span class="chip chip-blue">Live</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="riskChart" role="img" aria-label="Risk distribution donut chart">38 green, 8 amber, 1 red patients.</canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>BP Trend — All Patients (7 days)</h3>
+      <div class="chart-wrap">
+        <canvas id="bpChart" role="img" aria-label="7 day average blood pressure trend">Systolic averages over 7 days.</canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>PPRS Distribution</h3>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="flex:1">
+          <div class="label" style="margin-bottom:4px">Green (70–100)</div>
+          <div class="prog"><div class="prog-fill" style="width:81%;background:var(--green400)"></div></div>
+        </div>
+        <div class="val-sm" style="min-width:36px;text-align:right;color:var(--green600)">38</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="flex:1">
+          <div class="label" style="margin-bottom:4px">Amber (40–69)</div>
+          <div class="prog"><div class="prog-fill" style="width:17%;background:var(--amber400)"></div></div>
+        </div>
+        <div class="val-sm" style="min-width:36px;text-align:right;color:var(--amber600)">8</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div class="label" style="margin-bottom:4px">Red (0–39)</div>
+          <div class="prog"><div class="prog-fill" style="width:2%;background:var(--red400)"></div></div>
+        </div>
+        <div class="val-sm" style="min-width:36px;text-align:right;color:var(--red600)">1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="doctor-patients">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Patient List</h3>
+      <div class="patient-row">
+        <div class="avatar av-red">LP</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Lakshmi P.</div>
+          <div style="font-size:11px;color:var(--text2)">Week 32 · BP 148/94 · PPRS 45</div>
+        </div>
+        <span class="risk-badge rb-red">High Risk</span>
+      </div>
+      <div class="patient-row">
+        <div class="avatar av-amber">GS</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Gomathi S.</div>
+          <div style="font-size:11px;color:var(--text2)">Week 28 · BP 126/82 · PPRS 62</div>
+        </div>
+        <span class="risk-badge rb-amber">Watch</span>
+      </div>
+      <div class="patient-row">
+        <div class="avatar av-green">PK</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Priya K.</div>
+          <div style="font-size:11px;color:var(--text2)">Week 24 · BP 118/76 · PPRS 82</div>
+        </div>
+        <span class="risk-badge rb-green">Normal</span>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Patient Detail — Lakshmi P.</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="chip chip-red">Red Alert</span>
+          <span class="chip chip-blue">Week 32</span>
+          <span class="chip" style="background:var(--bg2)">Primigravida</span>
+        </div>
+        <div class="grid-2" style="margin-bottom:10px">
+          <div class="stat-card">
+            <div class="stat-num" style="font-size:20px;color:var(--red400)">148/94</div>
+            <div class="stat-lbl">Blood pressure</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="font-size:20px;color:var(--red400)">45</div>
+            <div class="stat-lbl">PPRS score</div>
+          </div>
+        </div>
+        <div style="background:var(--red50);border-radius:var(--radius-sm);padding:10px;margin-bottom:10px;border:0.5px solid var(--red400)">
+          <div style="font-size:12px;font-weight:500;color:var(--red600)">AI Clinical Recommendation</div>
+          <p style="font-size:12px;margin-top:4px">Preeclampsia probability: <strong>73%</strong>. PlGF-based model indicates impaired placental circulation. Consider: MgSO₄ prophylaxis, aspirin review, expedited delivery planning if ≥34 weeks.</p>
+          <div style="font-size:10px;color:var(--red400);margin-top:4px">SHAP factors: MAP ↑, uterine PI ↑, HR variability ↓</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-red btn-sm" style="flex:1">Refer to Hospital</button>
+          <button class="btn btn-outline btn-sm" style="flex:1">Teleconsult</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="doctor-alerts">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Alert Centre</h3>
+      <div class="alert-card red">
+        <div class="alert-title blink">🔴 EMERGENCY — Lakshmi P.</div>
+        <div class="alert-sub">BP 148/94 at 10:15 AM · PPRS dropped to 45 from 68 in 48 hours · ASHA notified</div>
+        <div class="btn-row" style="margin-top:10px;margin-bottom:0">
+          <button class="btn btn-red btn-sm" style="flex:1">Call ASHA</button>
+          <button class="btn btn-outline btn-sm" style="flex:1">Write notes</button>
+        </div>
+      </div>
+      <div class="alert-card amber">
+        <div class="alert-title">⚠️ Gomathi S. — Repeated high BP readings</div>
+        <div class="alert-sub">126/82 yesterday · 129/84 today · Trend worsening</div>
+      </div>
+      <div class="alert-card green">
+        <div class="alert-title">✅ 38 patients — All normal today</div>
+        <div class="alert-sub">Automated daily review completed at 6:00 AM</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="doctor-analytics">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Analytics</h3>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="outcomeChart" role="img" aria-label="Monthly outcome chart">Monthly preterm births, normal deliveries, and referrals over 6 months.</canvas>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Risk factors prevalence</h3>
+        <div class="heatmap-row" style="margin-top:8px">
+          <div class="heatmap-lbl">Hypertension</div>
+          <div class="heatmap-cell" style="background:var(--red50);color:var(--red600)">18%</div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-lbl">Anaemia</div>
+          <div class="heatmap-cell" style="background:var(--amber50);color:var(--amber600)">34%</div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-lbl">Low weight</div>
+          <div class="heatmap-cell" style="background:var(--amber50);color:var(--amber600)">22%</div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-lbl">Diabetes</div>
+          <div class="heatmap-cell" style="background:var(--red50);color:var(--red600)">12%</div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-lbl">Normal</div>
+          <div class="heatmap-cell" style="background:var(--green50);color:var(--green600)">68%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="doctor-telemedicine">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Teleconsult Queue</h3>
+      <div class="card" style="background:var(--red50);border:0.5px solid var(--red400)">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="avatar av-red">LP</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">Lakshmi P. — URGENT</div>
+            <div style="font-size:11px;color:var(--red600)">Requested 10 min ago · High BP</div>
+          </div>
+          <button class="btn btn-red btn-sm" style="width:auto">Join</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="avatar av-amber">GS</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">Gomathi S.</div>
+            <div style="font-size:11px;color:var(--text2)">Scheduled 2:00 PM · Diet query</div>
+          </div>
+          <button class="btn btn-outline btn-sm" style="width:auto">Prepare</button>
+        </div>
+      </div>
+      <div style="background:var(--blue50);border-radius:var(--radius-sm);padding:12px;border:0.5px solid var(--blue100)">
+        <div style="font-size:12px;font-weight:500;color:var(--blue600)">Works offline via SMS</div>
+        <p style="font-size:12px;margin-top:4px">When internet unavailable, consultation summary auto-sent via encrypted SMS to ASHA.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     ADMIN / GOVERNMENT DASHBOARD
+════════════════════════════════════════════ -->
+<div id="role-admin" style="display:none">
+  <div class="screen-tabs" id="admin-tabs">
+    <div class="stab active" onclick="switchScreen('admin','overview')">Overview</div>
+    <div class="stab" onclick="switchScreen('admin','heatmap')">Heatmap</div>
+    <div class="stab" onclick="switchScreen('admin','devices')">Devices</div>
+    <div class="stab" onclick="switchScreen('admin','reports')">Reports</div>
+    <div class="stab" onclick="switchScreen('admin','outcomes')">Outcomes</div>
+  </div>
+
+  <div class="web-view active" id="admin-overview">
+    <div style="margin-top:14px">
+      <div class="card" style="background:var(--blue800);border:none">
+        <div style="color:rgba(255,255,255,0.7);font-size:12px">Government Health Dept · Tamil Nadu</div>
+        <div style="color:#fff;font-size:18px;font-weight:500;margin:4px 0">Aurea Materna Dashboard</div>
+        <div style="color:rgba(255,255,255,0.7);font-size:12px">District: Coimbatore · Last update: 2 min ago</div>
+      </div>
+
+      <div class="stat-grid" style="margin-top:14px">
+        <div class="stat-card">
+          <div class="stat-num">1,247</div>
+          <div class="stat-lbl">Total mothers enrolled</div>
+          <div class="stat-delta delta-up">+84 this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">1,089</div>
+          <div class="stat-lbl">Devices active</div>
+          <div class="stat-delta delta-up">87% coverage</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--red400)">23</div>
+          <div class="stat-lbl">High risk (red)</div>
+          <div class="stat-delta delta-down">↑ 4 from last week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--green600)">94%</div>
+          <div class="stat-lbl">Adherence rate</div>
+          <div class="stat-delta delta-up">+2% vs last month</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>District risk trend (30 days)</h3>
+        <div class="chart-wrap">
+          <canvas id="districtChart" role="img" aria-label="District risk trend over 30 days">Red, amber and green patient counts over 30 days.</canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Key impact metrics</h3>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)">
+          <span class="label">Maternal mortality (this year)</span>
+          <span style="font-size:13px;font-weight:500;color:var(--green600)">0 deaths ↓ 3 YoY</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)">
+          <span class="label">Preterm births prevented (est.)</span>
+          <span style="font-size:13px;font-weight:500;color:var(--green600)">18 this quarter</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)">
+          <span class="label">Emergency referrals escalated</span>
+          <span style="font-size:13px;font-weight:500">47 (avg 4h response)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0">
+          <span class="label">ASHA workers trained</span>
+          <span style="font-size:13px;font-weight:500">62 of 68 certified</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="admin-heatmap">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Village-level risk heatmap</h3>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:11px;text-align:center">
+          <div style="background:var(--green50);border:0.5px solid var(--green400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--green600)">Karamadai</div>
+            <div style="color:var(--green600)">18 mothers</div>
+            <div style="color:var(--green600)">🟢 Safe</div>
+          </div>
+          <div style="background:var(--amber50);border:0.5px solid var(--amber400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--amber600)">Mettupalayam</div>
+            <div style="color:var(--amber600)">24 mothers</div>
+            <div style="color:var(--amber600)">🟡 Watch</div>
+          </div>
+          <div style="background:var(--red50);border:0.5px solid var(--red400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--red600)">Annur</div>
+            <div style="color:var(--red600)">16 mothers</div>
+            <div style="color:var(--red600)">🔴 Alert</div>
+          </div>
+          <div style="background:var(--green50);border:0.5px solid var(--green400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--green600)">Thondamuthur</div>
+            <div style="color:var(--green600)">21 mothers</div>
+            <div style="color:var(--green600)">🟢 Safe</div>
+          </div>
+          <div style="background:var(--green50);border:0.5px solid var(--green400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--green600)">Kinathukadavu</div>
+            <div style="color:var(--green600)">12 mothers</div>
+            <div style="color:var(--green600)">🟢 Safe</div>
+          </div>
+          <div style="background:var(--amber50);border:0.5px solid var(--amber400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--amber600)">Madukkarai</div>
+            <div style="color:var(--amber600)">29 mothers</div>
+            <div style="color:var(--amber600)">🟡 Watch</div>
+          </div>
+          <div style="background:var(--green50);border:0.5px solid var(--green400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--green600)">Sulur</div>
+            <div style="color:var(--green600)">20 mothers</div>
+            <div style="color:var(--green600)">🟢 Safe</div>
+          </div>
+          <div style="background:var(--amber50);border:0.5px solid var(--amber400);border-radius:6px;padding:10px">
+            <div style="font-weight:500;color:var(--amber600)">Sarcarsamakulam</div>
+            <div style="color:var(--amber600)">11 mothers</div>
+            <div style="color:var(--amber600)">🟡 Watch</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:12px;font-size:11px;justify-content:center">
+          <span style="color:var(--green600)">🟢 PPRS 70–100 · Low risk</span>
+          <span style="color:var(--amber600)">🟡 PPRS 40–69 · Monitor</span>
+          <span style="color:var(--red600)">🔴 PPRS 0–39 · High risk</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="admin-devices">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Device Fleet Management</h3>
+      <div class="stat-grid" style="margin-bottom:12px">
+        <div class="stat-card">
+          <div class="stat-num">1,089</div>
+          <div class="stat-lbl">Active patches</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--amber400)">158</div>
+          <div class="stat-lbl">Low battery</div>
+        </div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">📟</div>
+        <div class="device-info">
+          <div class="device-name">Patch #AM-2401 · Karamadai</div>
+          <div class="device-sub">Battery 87% · Signal strong · Last sync 4m ago</div>
+        </div>
+        <div class="device-status ds-active">Active</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">📟</div>
+        <div class="device-info">
+          <div class="device-name">Patch #AM-2389 · Annur</div>
+          <div class="device-sub">Battery 18% · Signal weak · Last sync 2h ago</div>
+        </div>
+        <div class="device-status ds-warn">Low bat.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">📡</div>
+        <div class="device-info">
+          <div class="device-name">LoRa Gateway · Mettupalayam PHC</div>
+          <div class="device-sub">Relaying 24 devices · Online</div>
+        </div>
+        <div class="device-status ds-active">Online</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">📡</div>
+        <div class="device-info">
+          <div class="device-name">LoRa Gateway · Kinathukadavu</div>
+          <div class="device-sub">Relaying 12 devices · Maintenance due</div>
+        </div>
+        <div class="device-status ds-warn">Maintenance</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="admin-reports">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Monthly Reports</h3>
+      <div class="card-sm" style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">📄</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">April 2026 — District Summary</div>
+          <div style="font-size:11px;color:var(--text2)">1,247 mothers · 3 outcomes · PDF</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="width:auto">Export</button>
+      </div>
+      <div class="card-sm" style="display:flex;align-items:center;gap:12px;margin-top:6px">
+        <div style="font-size:24px">📊</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Q1 2026 — Outcome Analysis</div>
+          <div style="font-size:11px;color:var(--text2)">Preterm prevention · XLSX</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="width:auto">Export</button>
+      </div>
+      <div class="card-sm" style="display:flex;align-items:center;gap:12px;margin-top:6px">
+        <div style="font-size:24px">🗺️</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">Village risk map — April 2026</div>
+          <div style="font-size:11px;color:var(--text2)">Geospatial heatmap · PNG</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="width:auto">Export</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="web-view" id="admin-outcomes">
+    <div style="margin-top:14px">
+      <h3 style="margin-bottom:12px">Clinical Outcomes</h3>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="outcomesChart2" role="img" aria-label="Maternal outcomes comparison before and after Aurea Materna deployment">Outcomes before and after program.</canvas>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>Program impact vs baseline</h3>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border)">
+          <span class="label">Maternal mortality rate</span>
+          <span style="font-size:13px;color:var(--green600);font-weight:500">↓ 62%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border)">
+          <span class="label">Preterm births</span>
+          <span style="font-size:13px;color:var(--green600);font-weight:500">↓ 38%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border)">
+          <span class="label">Emergency escalation time</span>
+          <span style="font-size:13px;color:var(--green600);font-weight:500">↓ from 18h to 4h</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0">
+          <span class="label">Healthcare cost per mother</span>
+          <span style="font-size:13px;color:var(--green600);font-weight:500">↓ 44%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ─── ROLE + SCREEN SWITCHER ─── */
+function switchRole(role){
+  ['mother','asha','doctor','admin'].forEach(r=>{
+    const el=document.getElementById('role-'+r);
+    if(el) el.style.display=r===role?'block':'none';
+  });
+  document.querySelectorAll('.role-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['mother','asha','doctor','admin'][i]===role);
+  });
+  // activate first screen
+  const tabs=document.getElementById(role+'-tabs');
+  if(tabs){
+    const firstTab=tabs.querySelector('.stab');
+    if(firstTab){
+      const scr=firstTab.getAttribute('onclick').match(/'([^']+)'\)/);
+      if(scr) switchScreen(role,scr[1]);
+    }
+  }
+}
+
+function switchScreen(role,screen){
+  // views
+  document.querySelectorAll('#role-'+role+' .view, #role-'+role+' .web-view').forEach(v=>{
+    v.classList.remove('active');
+  });
+  const target=document.getElementById(role+'-'+screen);
+  if(target) target.classList.add('active');
+  // tabs
+  const tabs=document.getElementById(role+'-tabs');
+  if(tabs){
+    tabs.querySelectorAll('.stab').forEach(t=>{
+      const match=t.getAttribute('onclick').includes("'"+screen+"'");
+      t.classList.toggle('active',match);
+    });
+  }
+}
+
+/* ─── CHARTS ─── */
+function isDark(){return matchMedia('(prefers-color-scheme: dark)').matches}
+const textCol=isDark()?'#B4B2A9':'#888780';
+const gridCol=isDark()?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
+
+const chartDefs=[
+  {id:'trendChart',type:'line',labels:['12am','3','6','9','12pm','3','6','9','12'],data:[{label:'HR (bpm)',data:[78,80,82,85,84,88,86,90,84],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',fill:true,tension:0.4,borderWidth:1.5,pointRadius:2},{label:'SpO₂ (%)',data:[97,98,98,97,98,97,99,98,98],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',fill:true,tension:0.4,borderWidth:1.5,pointRadius:2}],yMin:60,yMax:105},
+  {id:'riskChart',type:'doughnut',labels:['Normal (38)','Watch (8)','High risk (1)'],data:[{data:[38,8,1],backgroundColor:['#639922','#BA7517','#E24B4A'],borderWidth:0}]},
+  {id:'bpChart',type:'line',labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],data:[{label:'Avg Systolic',data:[118,120,119,122,125,121,119],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.06)',fill:true,tension:0.4,borderWidth:1.5,pointRadius:3},{label:'High risk (140)',data:[140,140,140,140,140,140,140],borderColor:'#E24B4A',borderDash:[4,4],borderWidth:1,pointRadius:0}]},
+  {id:'districtChart',type:'bar',labels:['W1','W2','W3','W4'],data:[{label:'Normal',data:[820,854,901,951],backgroundColor:'#639922',stack:'s'},{label:'Watch',data:[180,160,145,135],backgroundColor:'#BA7517',stack:'s'},{label:'High risk',data:[40,33,30,23],backgroundColor:'#E24B4A',stack:'s'}]},
+  {id:'outcomeChart',type:'bar',labels:['Nov','Dec','Jan','Feb','Mar','Apr'],data:[{label:'Normal deliveries',data:[28,30,32,34,36,38],backgroundColor:'#639922'},{label:'Preterm',data:[5,4,4,3,3,2],backgroundColor:'#BA7517'},{label:'Referrals',data:[8,7,6,5,5,4],backgroundColor:'#378ADD'}]},
+  {id:'outcomesChart2',type:'bar',labels:['Maternal deaths','Preterm births','Avg response (h)'],data:[{label:'Before Aurea Materna',data:[3,29,18],backgroundColor:'#888780'},{label:'After deployment',data:[0,18,4],backgroundColor:'#378ADD'}]},
+];
+
+document.addEventListener('DOMContentLoaded',()=>{});
+// init charts after slight delay to ensure canvases are in DOM
+setTimeout(()=>{
+  chartDefs.forEach(def=>{
+    const el=document.getElementById(def.id);
+    if(!el) return;
+    const cfg={type:def.type,data:{labels:def.labels,datasets:def.data},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:def.type==='doughnut',position:'bottom',labels:{color:textCol,font:{size:11},boxWidth:10,padding:12}}},scales:def.type==='doughnut'?{}:{x:{ticks:{color:textCol,font:{size:10}},grid:{color:gridCol}},y:{ticks:{color:textCol,font:{size:10}},grid:{color:gridCol},min:def.yMin,max:def.yMax}}}};
+    new Chart(el,cfg);
+  });
+},500);
+
+// Toggle handler
+document.querySelectorAll('.toggle:not([onclick])').forEach(t=>{
+  t.addEventListener('click',()=>t.classList.toggle('on'));
+});
+</script>
+</body>
+</html>
