@@ -27,7 +27,13 @@ export default function MotherHome() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Home</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.greeting}>Home</Text>
+              <View style={styles.verifiedBadge}>
+                <Ionicons name="checkmark-seal" size={16} color="#0F6E56" />
+                <Text style={styles.verifiedText}>Verified</Text>
+              </View>
+            </View>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity
@@ -109,6 +115,8 @@ const styles = StyleSheet.create({
   scroll: { padding: 16, paddingBottom: 100 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   greeting: { fontSize: 28, fontWeight: '800', color: '#0F172A' },
+  verifiedBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0FDFA', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, marginLeft: 12, borderWidth: 1, borderColor: '#CCFBF1' },
+  verifiedText: { color: '#0F766E', fontSize: 11, fontWeight: '700', marginLeft: 4 },
   profileBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
   vitalsGrid: { marginBottom: 16 },
   vitalRow: { flexDirection: 'row', marginBottom: 8 },

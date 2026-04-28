@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackedBarChart } from 'react-native-chart-kit';
 import { Colors } from '../../constants/Colors';
@@ -36,18 +36,27 @@ export default function AdminOverview() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
         
-        <View style={styles.headerCard}>
-          <Text style={styles.headerLabel}>Government Health Dept · Tamil Nadu</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.headerTitle}>Aurea Materna Dashboard</Text>
-            <TouchableOpacity 
+        {/* Header (Mother Style) */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Home</Text>
+            <Text style={styles.districtSub}>District: {adminData.district} · {adminData.location_village || 'Nallur'}</Text>
+          </View>
+          
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              style={[styles.profileBtn, { marginRight: 10 }]}
+              onPress={() => Alert.alert("Notifications", "No new alerts.")}
+            >
+              <Ionicons name="notifications-outline" size={24} color={Colors.textPrimary} />
+            </TouchableOpacity>
+            <TouchableOpacity
               style={styles.profileBtn}
               onPress={() => router.push('/(admin)/profile' as any)}
             >
               <Ionicons name="person" size={24} color={Colors.primary} />
             </TouchableOpacity>
           </View>
-          <Text style={styles.headerLabel}>District: {adminData.district} · Last update: 2 min ago</Text>
         </View>
 
         <View style={styles.grid2}>
@@ -110,10 +119,13 @@ function MetricRow({ label, val, color, isLast }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { padding: 16, paddingBottom: 40 },
-  headerCard: { backgroundColor: Colors.primary, borderRadius: 20, padding: 20, marginBottom: 16 },
-  headerLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 12 },
-  headerTitle: { color: 'white', fontSize: 22, fontWeight: '700', marginVertical: 6, flex: 1 },
-  profileBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.8)', alignItems: 'center', justifyContent: 'center', marginLeft: 12 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, marginTop: 10 },
+  greeting: { fontSize: 28, fontWeight: '800', color: '#0F172A' },
+  verifiedBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0FDFA', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, marginLeft: 12, borderWidth: 1, borderColor: '#CCFBF1' },
+  verifiedText: { color: '#0F766E', fontSize: 11, fontWeight: '700', marginLeft: 4 },
+  districtSub: { fontSize: 12, color: Colors.textMuted, marginTop: 4 },
+  profileBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
+  iconBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   grid2: { flexDirection: 'row', marginBottom: 8 },
   card: { backgroundColor: 'white', borderRadius: 20, padding: 16, marginTop: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
   cardTitle: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },

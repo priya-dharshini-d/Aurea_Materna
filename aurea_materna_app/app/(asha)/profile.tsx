@@ -88,7 +88,7 @@ export default function AshaProfile() {
             style={styles.logoutBtn} 
             onPress={() => {
               setRole(null);
-              router.replace('/');
+              router.replace('/auth/login');
             }}
           >
             <Text style={styles.logoutBtnText}>Log Out</Text>
