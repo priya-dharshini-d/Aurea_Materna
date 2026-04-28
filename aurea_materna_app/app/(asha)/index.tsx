@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   scroll: { padding: 20, paddingBottom: 60 },
   
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, marginTop: 4 },
-  greeting: { fontSize: 28, fontWeight: '800', color: Colors.textPrimary },
+  greeting: { fontSize: 28, fontWeight: '800', color: '#0F172A' },
   topProfileBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
 
   heroCard: { 

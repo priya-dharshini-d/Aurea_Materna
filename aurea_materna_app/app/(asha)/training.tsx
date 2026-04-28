@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     paddingTop: 8 
   },
   headerTextContainer: { flex: 1 },
-  pageTitle: { fontSize: 26, fontWeight: '800', color: '#1A4D6E', letterSpacing: -0.5 },
+  pageTitle: { fontSize: 26, fontWeight: '800', color: '#0F172A', letterSpacing: -0.5 },
   subtitle: { fontSize: 14, color: '#316A9E', marginTop: 4 },
   trophyBtn: {
     width: 44,
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#1A4D6E', marginBottom: 16, marginTop: 8 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#0F172A', marginBottom: 16, marginTop: 8 },
   
   card: {
     backgroundColor: 'white',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   progressFill: { height: '100%', backgroundColor: '#316A9E', borderRadius: 3 },
   
   cardFooter: { flexDirection: 'row', alignItems: 'center' },
-  playBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1A4D6E', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  playBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#0F172A', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   sessionText: { fontSize: 13, fontWeight: '600', color: '#94A3B8' },
 
   listCard: {

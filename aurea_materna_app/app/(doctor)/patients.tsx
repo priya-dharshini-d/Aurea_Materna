@@ -124,7 +124,7 @@ export default function DoctorPatients() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { padding: 16, paddingBottom: 40 },
-  pageTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary, marginBottom: 16 },
+  pageTitle: { fontSize: 28, fontWeight: '800', color: '#0F172A', marginBottom: 16 },
   list: { backgroundColor: 'white', borderRadius: 20, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
   
   modalContainer: { flex: 1, backgroundColor: Colors.bg },

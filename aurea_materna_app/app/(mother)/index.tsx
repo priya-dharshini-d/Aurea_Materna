@@ -27,7 +27,7 @@ export default function MotherHome() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Good morning, {motherData.name.split(' ')[0]} 🌿</Text>
+            <Text style={styles.greeting}>Home</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity
@@ -45,14 +45,7 @@ export default function MotherHome() {
           </View>
         </View>
 
-        {/* Voice Card */}
-        <TouchableOpacity style={styles.voiceCard} activeOpacity={0.8}>
-          <View style={{ flex: 1, marginRight: 12 }}>
-            <Text style={styles.voiceTitle}>All is well today, {motherData.name.split(' ')[0]}</Text>
-            <Text style={styles.voiceSub}>Tap to hear guidance in Tamil</Text>
-          </View>
-          <Ionicons name="mic-circle" size={40} color={Colors.primary} />
-        </TouchableOpacity>
+
 
         {/* Risk Ring */}
         <RiskRing score={motherData.pprs} status={motherData.pprsStatus as any} />
@@ -115,21 +108,18 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { padding: 16, paddingBottom: 100 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  greeting: { fontSize: 20, fontWeight: '600', color: Colors.textPrimary },
+  greeting: { fontSize: 28, fontWeight: '800', color: '#0F172A' },
   profileBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  voiceCard: { backgroundColor: Colors.primary, borderRadius: 16, padding: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' },
-  voiceTitle: { color: 'white', fontSize: 16, fontWeight: '700', marginBottom: 4 },
-  voiceSub: { color: 'rgba(255,255,255,0.8)', fontSize: 13 },
   vitalsGrid: { marginBottom: 16 },
   vitalRow: { flexDirection: 'row', marginBottom: 8 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary, marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary, marginBottom: 20 },
   quickAccessContainer: { backgroundColor: 'white', borderRadius: 20, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
   quickAccessGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   quickAccessCard: { width: '30%', alignItems: 'center', marginBottom: 16 },
   qaIconContainer: { width: 60, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   qaTitle: { fontSize: 12, fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
   card: { backgroundColor: 'white', borderRadius: 20, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary, marginBottom: 12 },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary, marginBottom: 20 },
   checkupRow: { flexDirection: 'row', alignItems: 'flex-start' },
   calendarIconBg: { width: 48, height: 48, borderRadius: 14, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   checkupInfo: { flex: 1 },

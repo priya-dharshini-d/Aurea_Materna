@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   headerTextContainer: {
     flex: 1,
   },
-  pageTitle: { fontSize: 28, fontWeight: '800', color: Colors.textPrimary, letterSpacing: -0.5 },
+  pageTitle: { fontSize: 28, fontWeight: '800', color: '#0F172A', letterSpacing: -0.5 },
   subtitle: { fontSize: 14, color: Colors.textMuted, marginTop: 6 },
   addButton: {
     width: 44,

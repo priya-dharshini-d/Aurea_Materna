@@ -58,7 +58,7 @@ export default function AshaSync() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { padding: 16, paddingBottom: 40 },
-  pageTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary, marginBottom: 16 },
+  pageTitle: { fontSize: 24, fontWeight: '700', color: '#0F172A', marginBottom: 16 },
   card: { backgroundColor: 'white', borderRadius: 20, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
   cardTitle: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 16 },
