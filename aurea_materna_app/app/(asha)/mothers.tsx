@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, FlatList, Modal, KeyboardAvoidingView, Platform, SafeAreaView as RNSafeAreaView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
-import { fetchFromApi } from '../../constants/api';
 import { ActivityIndicator } from 'react-native';
 import MotherRow from '../../components/MotherRow';
+import { ashaData as mockAshaData } from '../../constants/MockData';
 
 const filters = ['All', 'Normal', 'Watch', 'High Risk'];
 const riskFactorOptions = ['Anaemia', 'Diabetes', 'Hypertension', 'Previous C-sec', 'Age <18 / >35'];
@@ -16,31 +16,6 @@ export default function AshaMothers() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
   const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchFromApi('/asha');
-        setAshaData(data);
-        setMothersList(data.mothers);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  if (loading) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
-
-  if (!ashaData) return null;
   
   // Add Mother Modal State
   const [isModalVisible, setModalVisible] = useState(false);
@@ -52,6 +27,23 @@ export default function AshaMothers() {
   const [newMotherGravida, setNewMotherGravida] = useState('');
   const [newMotherVillage, setNewMotherVillage] = useState('');
   const [selectedRisks, setSelectedRisks] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Reverting to mock data
+    setAshaData(mockAshaData);
+    setMothersList(mockAshaData.mothers);
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  if (!ashaData) return null;
 
   const toggleRisk = (risk: string) => {
     if (selectedRisks.includes(risk)) {

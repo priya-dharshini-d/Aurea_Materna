@@ -19,8 +19,6 @@ export default function RootLayout() {
       <RoleContext.Provider value={{ currentRole, setRole }}>
         <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
           <Stack.Screen name="index" />
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen name="login" options={{ headerShown: true, headerTitle: 'Login', headerBackTitle: 'Back' }} />
           <Stack.Screen name="(mother)" />
           <Stack.Screen name="(asha)" />
           <Stack.Screen name="(doctor)" />

@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackedBarChart } from 'react-native-chart-kit';
 import { Colors } from '../../constants/Colors';
-import { fetchFromApi } from '../../constants/api';
 import { ActivityIndicator } from 'react-native';
 import StatCard from '../../components/StatCard';
 import { Ionicons } from '@expo/vector-icons';
+import { adminData as mockAdminData } from '../../constants/MockData';
 
 const screenWidth = Dimensions.get('window').width - 64;
 
@@ -18,9 +18,8 @@ export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchFromApi('/admin')
-      .then(setAdminData)
-      .finally(() => setLoading(false));
+    setAdminData(mockAdminData);
+    setLoading(false);
   }, []);
 
   if (loading) {

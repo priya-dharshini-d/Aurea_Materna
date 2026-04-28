@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Modal, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
-import { fetchFromApi } from '../../constants/api';
 import { ActivityIndicator } from 'react-native';
 import MotherRow from '../../components/MotherRow';
+import { doctorData as mockDoctorData } from '../../constants/MockData';
 
 export default function DoctorPatients() {
   const [doctorData, setDoctorData] = useState<any>(null);
@@ -12,9 +12,8 @@ export default function DoctorPatients() {
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
 
   useEffect(() => {
-    fetchFromApi('/doctor')
-      .then(setDoctorData)
-      .finally(() => setLoading(false));
+    setDoctorData(mockDoctorData);
+    setLoading(false);
   }, []);
 
   if (loading) {

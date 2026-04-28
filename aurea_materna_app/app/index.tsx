@@ -38,7 +38,7 @@ export default function RoleSelector() {
             onPress={() => selectRole('asha', '/(asha)')} 
           />
           <RoleCard 
-            icon="stethoscope-outline" 
+            icon="medical-outline" 
             title="Doctor" 
             desc="I am a PHC doctor" 
             onPress={() => selectRole('doctor', '/(doctor)')} 
