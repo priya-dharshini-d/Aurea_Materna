@@ -23,21 +23,37 @@ export default function MotherChat() {
     }
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
     
-    setMessages(prev => [...prev, { id: Date.now().toString(), text: input, isUser: true }]);
-    const currentInput = input;
+    const userMessage = input.trim();
+    setMessages(prev => [...prev, { id: Date.now().toString(), text: userMessage, isUser: true }]);
     setInput('');
     
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://10.10.193.218:8000/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userMessage }),
+      });
+      
+      const data = await response.json();
+      
       setMessages(prev => [...prev, { 
         id: (Date.now() + 1).toString(), 
-        text: 'I am here to help you. Since I am an AI, I suggest speaking to your ASHA worker for specific medical advice.', 
+        text: data.reply + (data.source ? `\n\n(Source: ${data.source})` : ''), 
         isUser: false 
       }]);
-    }, 1000);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev, { 
+        id: (Date.now() + 1).toString(), 
+        text: 'Sorry, I am having trouble connecting to my knowledge base right now.', 
+        isUser: false 
+      }]);
+    }
   };
 
   return (

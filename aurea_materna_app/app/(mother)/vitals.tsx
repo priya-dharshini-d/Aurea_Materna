@@ -14,7 +14,7 @@ export default function MotherVitals() {
   useEffect(() => {
     const fetchLatest = async () => {
       try {
-        const res = await fetch('http://localhost:8000/data/latest');
+        const res = await fetch('http://10.10.193.218:8000/data/latest');
         const data = await res.json();
         if (data && data.timestamp) {
           setSensorData(data);

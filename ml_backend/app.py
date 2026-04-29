@@ -28,8 +28,10 @@ from typing import List, Optional
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from model import RiskPredictor
+from rag import query_rag
 
 # ── config ────────────────────────────────────────────────────────
 HISTORY_LEN   = 200      # rolling history kept in RAM
@@ -206,6 +208,24 @@ async def get_history(n: int = Query(100, description="Number of records to fetc
     with state_lock:
         records = list(history)
     return records[-n:]
+
+# ── Chatbot RAG endpoint ──────────────────────────────────────────
+class ChatRequest(BaseModel):
+    message: str
+
+@app.post("/chat")
+async def chat_endpoint(req: ChatRequest):
+    """
+    RAG-based AI assistant endpoint.
+    Retrieves context from maternal health knowledge base and generates an answer.
+    """
+    result = query_rag(req.message)
+    return {
+        "reply": result["answer"],
+        "source": result["source_title"],
+        "confidence": result["confidence"]
+    }
+
 
 
 if __name__ == "__main__":
