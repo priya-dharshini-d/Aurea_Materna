@@ -24,9 +24,9 @@
 // ================================================================
 //  ▶▶  EDIT THESE THREE LINES  ◀◀
 // ================================================================
-const char* WIFI_SSID  = "Pixel crDroid";
-const char* WIFI_PASS  = "hamvish200";
-const char* SERVER_IP  = "192.168.196.168";   // PC's local IP address on Pixel Hotspot
+const char* WIFI_SSID  = "DESKTOP";
+const char* WIFI_PASS  = "vishnu2006";
+const char* SERVER_IP  = "10.10.193.218";   // PC's local IP address on Pixel Hotspot
 // ================================================================
 
 #define SERVER_PORT  8000
