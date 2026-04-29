@@ -24,9 +24,9 @@
 // ================================================================
 //  ▶▶  EDIT THESE THREE LINES  ◀◀
 // ================================================================
-const char* WIFI_SSID  = "Pixel crDroid";
-const char* WIFI_PASS  = "hamvish200";
-const char* SERVER_IP  = "192.168.196.168";   // PC's local IP address on Pixel Hotspot
+const char* WIFI_SSID  = "DESKTOP";
+const char* WIFI_PASS  = "vishnu2006";
+const char* SERVER_IP  = "10.10.193.218";   // PC's local IP address on Pixel Hotspot
 // ================================================================
 
 #define SERVER_PORT  8000
@@ -45,6 +45,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 #define SDA_PIN       21
 #define SCL_PIN       22
 #define ONE_WIRE_BUS  4
+#define STATUS_LED_PIN 13 // LED pin for showing Normal status
 
 // ---------------- DS18B20 ----------------
 OneWire oneWire(ONE_WIRE_BUS);
@@ -125,6 +126,7 @@ void setup() {
   pinMode(LO_PLUS,   INPUT);
   pinMode(LO_MINUS,  INPUT);
   pinMode(MOTOR_PIN, OUTPUT);
+  pinMode(STATUS_LED_PIN, OUTPUT);
 
   Wire.begin(SDA_PIN, SCL_PIN);
   Wire.setClock(100000);
@@ -288,9 +290,16 @@ void postData(int ecg, float temp, int16_t ax) {
   int code = http.POST(payload);
 
   if (code > 0) {
+    String response = http.getString();
     Serial.printf("[POST] %d  %s\n", code, payload.c_str());
+    if (response.indexOf("\"risk_label\":\"Normal\"") != -1 || response.indexOf("\"risk_label\": \"Normal\"") != -1) {
+      digitalWrite(STATUS_LED_PIN, HIGH);
+    } else {
+      digitalWrite(STATUS_LED_PIN, LOW);
+    }
   } else {
     Serial.printf("[POST] Error: %s\n", http.errorToString(code).c_str());
+    digitalWrite(STATUS_LED_PIN, LOW);
   }
 
   http.end();

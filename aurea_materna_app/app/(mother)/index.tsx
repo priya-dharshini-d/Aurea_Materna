@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -19,6 +19,41 @@ const quickAccessItems = [
 
 export default function MotherHome() {
   const router = useRouter();
+  const [sensorData, setSensorData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/data/latest');
+        const data = await res.json();
+        if (data && data.timestamp) {
+          setSensorData(data);
+        }
+      } catch (err) {
+        // console.warn("Failed to fetch sensor data:", err);
+      }
+    };
+
+    fetchLatest();
+    const interval = setInterval(fetchLatest, 1000); // Poll every second
+    return () => clearInterval(interval);
+  }, []);
+
+  // Compute values from sensorData or fallback to mock data
+  const hr = sensorData?.bpm ?? motherData.vitals.hr;
+  const ecg = sensorData?.ecg ?? 0;
+  const spo2 = sensorData?.spo2 ?? motherData.vitals.spo2;
+  const temp = sensorData?.temp ?? motherData.vitals.temp;
+
+  // ML Analysis Result Mapping
+  const riskLevel = sensorData?.prediction?.risk_level ?? 0;
+  const riskStatusMap: Record<number, 'green' | 'amber' | 'red'> = {
+    0: 'green',
+    1: 'amber',
+    2: 'red',
+  };
+  const riskStatus = riskStatusMap[riskLevel] || 'green';
+  const pprsScore = sensorData?.prediction?.score ?? 82;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -54,17 +89,17 @@ export default function MotherHome() {
 
 
         {/* Risk Ring */}
-        <RiskRing score={motherData.pprs} status={motherData.pprsStatus as any} />
+        <RiskRing score={pprsScore} status={riskStatus} />
 
         {/* Vitals */}
         <View style={styles.vitalsGrid}>
           <View style={styles.vitalRow}>
-            <VitalCard icon="heart" value={String(motherData.vitals.hr)} unit="bpm" label="Heart Rate" />
-            <VitalCard icon="water" value={motherData.vitals.bp} unit="mmHg" label="Blood Pressure" />
+            <VitalCard icon="heart" value={String(hr)} unit="bpm" label="Heart Rate" />
+            <VitalCard icon="pulse" value={String(ecg)} unit="mV" label="ECG Value" />
           </View>
           <View style={styles.vitalRow}>
-            <VitalCard icon="pulse" value={String(motherData.vitals.spo2)} unit="%" label="Oxygen Saturation" />
-            <VitalCard icon="thermometer" value={String(motherData.vitals.temp)} unit="°C" label="Temperature" />
+            <VitalCard icon="pulse" value={String(spo2)} unit="%" label="Oxygen Saturation" />
+            <VitalCard icon="thermometer" value={String(temp)} unit="°C" label="Temperature" />
           </View>
         </View>
 
