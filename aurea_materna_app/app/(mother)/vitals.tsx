@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LineChart, BarChart } from 'react-native-chart-kit';
@@ -9,6 +9,47 @@ import WaveformChart from '../../components/WaveformChart';
 const screenWidth = Dimensions.get('window').width - 64;
 
 export default function MotherVitals() {
+  const [sensorData, setSensorData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/data/latest');
+        const data = await res.json();
+        if (data && data.timestamp) {
+          setSensorData(data);
+        }
+      } catch (err) {}
+    };
+
+    fetchLatest();
+    const interval = setInterval(fetchLatest, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const hr = sensorData?.bpm ?? motherData.vitals.hr;
+  const ecg = sensorData?.ecg ?? 0;
+  const spo2 = sensorData?.spo2 ?? motherData.vitals.spo2;
+  const temp = sensorData?.temp ?? motherData.vitals.temp;
+
+  const riskLevel = sensorData?.prediction?.risk_level ?? 0;
+  const riskLabel = sensorData?.prediction?.label ?? 'Normal';
+  const riskColor = riskLevel === 0 ? Colors.success : riskLevel === 1 ? Colors.warning : Colors.danger;
+  const riskBg = riskLevel === 0 ? Colors.successLight : riskLevel === 1 ? Colors.warningLight : Colors.dangerLight;
+  const pprsScore = sensorData?.prediction?.score ?? 82;
+
+  const hrStatus = hr > 100 || hr < 60 ? 'Abnormal' : 'Normal';
+  const hrColor = hrStatus === 'Normal' ? Colors.success : Colors.danger;
+
+  const ecgStatus = ecg > 4000 || ecg < 0 ? 'Abnormal' : 'Normal';
+  const ecgColor = ecgStatus === 'Normal' ? Colors.success : Colors.danger;
+
+  const spo2Status = spo2 < 95 ? 'Low' : 'Excellent';
+  const spo2Color = spo2Status === 'Low' ? Colors.danger : Colors.primary;
+
+  const tempStatus = temp > 37.5 ? 'High' : 'Normal';
+  const tempColor = tempStatus === 'Normal' ? Colors.success : Colors.danger;
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -18,10 +59,10 @@ export default function MotherVitals() {
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Live Readings</Text>
-          <VitalRow label="Heart Rate" value="84" unit="bpm" range="60-100" progress={60} color={Colors.success} />
-          <VitalRow label="Blood Pressure" value="118/76" unit="mmHg" range="below 140/90" progress={70} color={Colors.success} />
-          <VitalRow label="SpO₂" value="98" unit="%" range="above 95%" progress={90} color={Colors.primary} />
-          <VitalRow label="Body Temp" value="36.8" unit="°C" range="36.1-37.2" progress={50} color={Colors.success} isLast />
+          <VitalRow label="Heart Rate" value={String(hr)} unit="bpm" range="60-100" progress={hr > 100 ? 90 : hr < 60 ? 10 : 60} color={hrColor} status={hrStatus} />
+          <VitalRow label="ECG Value" value={String(ecg)} unit="mV" range="0-4095" progress={(ecg/4095)*100 || 50} color={ecgColor} status={ecgStatus} />
+          <VitalRow label="SpO₂" value={String(spo2)} unit="%" range="above 95%" progress={spo2} color={spo2Color} status={spo2Status} />
+          <VitalRow label="Body Temp" value={String(temp)} unit="°C" range="36.1-37.2" progress={50} color={tempColor} status={tempStatus} isLast />
         </View>
 
         <View style={styles.card}>
@@ -38,9 +79,9 @@ export default function MotherVitals() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Placental Perfusion Index</Text>
           <View style={styles.row}>
-            <View style={styles.scoreCircle}>
-              <Text style={styles.scoreText}>{motherData.pprs}</Text>
-              <Text style={styles.scoreLabel}>PPRS</Text>
+            <View style={[styles.scoreCircle, { borderColor: riskColor, backgroundColor: riskBg }]}>
+              <Text style={[styles.scoreText, { color: riskColor }]}>{pprsScore}</Text>
+              <Text style={[styles.scoreLabel, { color: riskColor }]}>PPRS</Text>
             </View>
             <View style={styles.textCol}>
               <Text style={styles.desc}>Near-infrared spectroscopy via patch. Placental oxygen delivery is adequate.</Text>
@@ -111,12 +152,12 @@ export default function MotherVitals() {
   );
 }
 
-function VitalRow({ label, value, unit, range, progress, color, isLast }: any) {
+function VitalRow({ label, value, unit, range, progress, color, isLast, status = "Normal" }: any) {
   return (
     <View style={[styles.vitalItem, !isLast && styles.borderBottom]}>
       <View style={styles.vitalHeader}>
         <Text style={styles.vitalLabel}>{label}</Text>
-        <Text style={styles.vitalStatus}>Normal</Text>
+        <Text style={[styles.vitalStatus, color === Colors.danger ? {color: Colors.danger, backgroundColor: Colors.dangerLight} : {}]}>{status}</Text>
       </View>
       <View style={styles.valueRow}>
         <Text style={styles.vitalValue}>{value}</Text>

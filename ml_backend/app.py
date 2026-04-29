@@ -105,6 +105,8 @@ def build_and_store(raw: dict, demo: bool):
     with state_lock:
         history.append(record)
         latest.update(record)
+        
+    return prediction
 
 
 # ── demo data generator ───────────────────────────────────────────
@@ -156,9 +158,9 @@ async def ingest(request: Request):
         return JSONResponse(status_code=400, content={"error": "Invalid JSON"})
 
     last_esp32_time = time.time()
-    build_and_store(raw, demo=False)
+    prediction = build_and_store(raw, demo=False)
 
-    return {"status": "ok", "ts": last_esp32_time}
+    return {"status": "ok", "ts": last_esp32_time, "risk_label": prediction["label"]}
 
 
 # ── SSE Broadcaster ───────────────────────────────────────────────

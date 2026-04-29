@@ -109,14 +109,10 @@ def load_or_create_model():
 
 
 # ── rule-based fallback ───────────────────────────────────────────
-def rule_based_predict(features: np.ndarray) -> int:
+def rule_based_predict(features: np.ndarray) -> tuple[int, int]:
     """
     Simple threshold rules when no trained model is available.
-
-    features layout (12 values):
-      [0]  ecg_mean   [1] ecg_std   [2] ecg_min   [3] ecg_max
-      [4]  temp_mean  [5] ax_mean   [6] ax_std     [7] ax_abs_max
-      [8]  bpm_mean   [9] spo2_mean [10] bp_sys_mean [11] bp_dia_mean
+    Returns (risk_level, continuous_score).
     """
     temp    = features[0, 4]
     bpm     = features[0, 8]
@@ -126,48 +122,44 @@ def rule_based_predict(features: np.ndarray) -> int:
     bp_sys  = features[0, 10]
     bp_dia  = features[0, 11]
 
-    score = 0
+    penalty = 0
 
-    # Temperature
-    if temp > 39.0:
-        score += 2
-    elif temp > 38.0:
-        score += 1
+    if temp > 39.0: penalty += 2
+    elif temp > 38.0: penalty += 1
 
-    # Heart rate
-    if bpm > 120 or bpm < 50:
-        score += 2
-    elif bpm > 100 or bpm < 60:
-        score += 1
+    if bpm > 120 or bpm < 50: penalty += 2
+    elif bpm > 100 or bpm < 60: penalty += 1
 
-    # Movement (fall / sudden jerk)
-    if ax_max > 18000:
-        score += 2
-    elif ax_max > 12000:
-        score += 1
+    if ax_max > 18000: penalty += 2
+    elif ax_max > 12000: penalty += 1
 
-    # ECG irregularity
-    if ecg_std > 800:
-        score += 1
+    if ecg_std > 800: penalty += 1
 
-    # SpO2 (low oxygen → risk)
-    if spo2 < 94.0:
-        score += 2
-    elif spo2 < 96.0:
-        score += 1
+    if spo2 < 94.0: penalty += 2
+    elif spo2 < 96.0: penalty += 1
 
-    # Blood Pressure (hypertension in pregnancy)
-    if bp_sys > 140 or bp_dia > 90:
-        score += 2
-    elif bp_sys > 130 or bp_dia > 85:
-        score += 1
+    if bp_sys > 140 or bp_dia > 90: penalty += 2
+    elif bp_sys > 130 or bp_dia > 85: penalty += 1
 
-    if score >= 4:
-        return 2   # High Risk
-    elif score >= 2:
-        return 1   # Moderate Risk
+    if penalty >= 4:
+        risk_level = 2
+    elif penalty >= 2:
+        risk_level = 1
     else:
-        return 0   # Normal
+        risk_level = 0
+
+    # Calculate a continuous health score (0-100) based on variance from ideals
+    score = 100.0
+    score -= abs(temp - 37.0) * 5
+    if bpm > 80: score -= (bpm - 80) * 0.5
+    elif bpm < 70: score -= (70 - bpm) * 0.5
+    score -= (100 - spo2) * 2
+    score -= max(0, bp_sys - 120) * 0.5
+    score -= max(0, bp_dia - 80) * 0.5
+
+    continuous_score = int(max(10, min(100, score)))
+
+    return risk_level, continuous_score
 
 
 # ── main predictor class ───────────────────────────────────────────
@@ -175,7 +167,7 @@ class RiskPredictor:
     def __init__(self):
         self.window = SensorWindow()
         self.model  = load_or_create_model()
-        self.last_prediction = {"label": "Normal", "risk_level": 0, "color": "#22c55e"}
+        self.last_prediction = {"label": "Normal", "risk_level": 0, "color": "#22c55e", "score": 82}
 
     def update(self, ecg: int, temp: float, ax: int, bpm: int,
                spo2: float = 98.0, bp_sys: int = 110, bp_dia: int = 72) -> dict:
@@ -188,13 +180,20 @@ class RiskPredictor:
 
         if self.model is not None:
             risk_level = int(self.model.predict(features)[0])
+            if hasattr(self.model, "predict_proba"):
+                probs = self.model.predict_proba(features)[0]
+                expected_risk = sum(i * p for i, p in enumerate(probs))
+                continuous_score = int(max(10, 100 - (expected_risk / 2.0) * 100))
+            else:
+                continuous_score = 82 if risk_level == 0 else 50 if risk_level == 1 else 20
         else:
-            risk_level = rule_based_predict(features)
+            risk_level, continuous_score = rule_based_predict(features)
 
         label = RISK_LABELS.get(risk_level, "Unknown")
         self.last_prediction = {
             "label":      label,
             "risk_level": risk_level,
             "color":      RISK_COLORS.get(label, "#ffffff"),
+            "score":      continuous_score
         }
         return self.last_prediction
