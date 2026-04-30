@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
@@ -6,7 +7,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+env_path = Path(__file__).parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 # Configure Gemini API
 API_KEY = os.getenv("GEMINI_API_KEY")

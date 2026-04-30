@@ -77,6 +77,12 @@ export default function AdminLayout() {
           title: 'Profile',
         }}
       />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

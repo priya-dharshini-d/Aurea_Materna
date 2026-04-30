@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { doctorData } from '../../constants/MockData';
 
@@ -18,47 +18,50 @@ export default function DoctorLayout() {
           shadowOpacity: 0.08,
           shadowRadius: 12,
           elevation: 20,
+          height: 70,
+          paddingBottom: 10,
+          paddingTop: 10
         },
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textMuted,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarActiveTintColor: '#2563EB',
+        tabBarInactiveTintColor: '#64748B',
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '700', marginTop: 2 },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Overview',
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'stats-chart' : 'stats-chart-outline'} size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'chart-bar' : 'chart-bar'} size={24} color={color} />
         }}
       />
       <Tabs.Screen
         name="patients"
         options={{
           title: 'Patients',
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'account' : 'account-outline'} size={24} color={color} />
         }}
       />
       <Tabs.Screen
         name="alerts"
         options={{
           title: 'Alerts',
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'alert-circle' : 'alert-circle-outline'} size={24} color={color} />,
-          tabBarBadge: doctorData.redCount > 0 ? doctorData.redCount : undefined,
-          tabBarBadgeStyle: { backgroundColor: Colors.danger, color: 'white' }
+          tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'alert-circle' : 'alert-circle-outline'} size={24} color={color} />,
+          tabBarBadge: 1,
+          tabBarBadgeStyle: { backgroundColor: '#B91C1C', color: 'white', fontSize: 10, fontWeight: '800' }
         }}
       />
       <Tabs.Screen
         name="analytics"
         options={{
           title: 'Analytics',
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'pie-chart' : 'pie-chart-outline'} size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'chart-arc' : 'chart-arc'} size={24} color={color} />
         }}
       />
       <Tabs.Screen
         name="consult"
         options={{
           title: 'Consult',
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'videocam' : 'videocam-outline'} size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'video' : 'video-outline'} size={24} color={color} />
         }}
       />
       <Tabs.Screen

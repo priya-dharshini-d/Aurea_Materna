@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 
 type Props = {
@@ -13,18 +13,24 @@ type Props = {
 };
 
 export default function AlertCard({ level, title, subtitle, aiRecommendation, onCall, onEscalate }: Props) {
-  let accentColor = Colors.success;
-  let iconName = 'checkmark-circle';
-  let iconColor = Colors.success;
+  let accentColor = '#22C55E'; // Green
+  let iconName = 'check-circle';
+  let iconColor = '#166534';
+  let bgIcon = 'check-bold';
+  let bgIconColor = '#22C55E';
 
   if (level === 'amber') {
-    accentColor = '#905E15'; // Darker amber from screenshot
-    iconName = 'warning';
-    iconColor = '#905E15';
+    accentColor = '#B45309'; // Amber
+    iconName = 'alert-decagram';
+    iconColor = '#92400E';
+    bgIcon = 'alert';
+    bgIconColor = '#F59E0B';
   } else if (level === 'red') {
-    accentColor = '#A02B2B'; // Dark red from screenshot
+    accentColor = '#B91C1C'; // Red
     iconName = 'alert-circle';
-    iconColor = '#A02B2B';
+    iconColor = '#991B1B';
+    bgIcon = 'circle-double';
+    bgIconColor = '#EF4444';
   }
 
   return (
@@ -33,9 +39,15 @@ export default function AlertCard({ level, title, subtitle, aiRecommendation, on
       
       <View style={styles.cardContent}>
         <View style={styles.header}>
-          <Ionicons name={iconName as any} size={22} color={iconColor} style={styles.icon} />
+          <View style={styles.iconContainer}>
+             <MaterialCommunityIcons name={iconName as any} size={24} color={iconColor} />
+          </View>
+          
           <View style={styles.headerText}>
-            <Text style={styles.title}>{title}</Text>
+            <View style={styles.titleRow}>
+              <MaterialCommunityIcons name={bgIcon as any} size={20} color={bgIconColor} style={{ marginRight: 8 }} />
+              <Text style={styles.title}>{title}</Text>
+            </View>
             <Text style={styles.subtitle}>{subtitle}</Text>
           </View>
         </View>
@@ -54,13 +66,13 @@ export default function AlertCard({ level, title, subtitle, aiRecommendation, on
           <View style={styles.btnRow}>
             {onCall && (
               <TouchableOpacity style={[styles.btn, styles.btnCall]} onPress={onCall}>
-                <Ionicons name="call" size={16} color="white" style={{ marginRight: 8 }} />
+                <Ionicons name="call" size={18} color="white" style={{ marginRight: 8 }} />
                 <Text style={styles.btnCallText}>Call Mother</Text>
               </TouchableOpacity>
             )}
             {onEscalate && (
               <TouchableOpacity style={[styles.btn, styles.btnEscalate]} onPress={onEscalate}>
-                <Ionicons name="git-network-outline" size={16} color="#1A202C" style={{ marginRight: 8 }} />
+                <MaterialCommunityIcons name="transit-connection-variant" size={18} color="#1A202C" style={{ marginRight: 8 }} />
                 <Text style={styles.btnEscalateText}>Escalate</Text>
               </TouchableOpacity>
             )}
@@ -74,57 +86,62 @@ export default function AlertCard({ level, title, subtitle, aiRecommendation, on
 const styles = StyleSheet.create({
   card: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    marginBottom: 16,
+    borderRadius: 24,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    elevation: 4,
     position: 'relative',
     overflow: 'hidden',
   },
   accentLine: {
     position: 'absolute',
     left: 0,
-    top: 14,
-    bottom: 14,
-    width: 4,
-    borderTopRightRadius: 4,
-    borderBottomRightRadius: 4,
+    top: 12,
+    bottom: 12,
+    width: 5,
+    borderTopRightRadius: 6,
+    borderBottomRightRadius: 6,
   },
   cardContent: {
-    padding: 16,
-    paddingLeft: 20,
+    padding: 20,
+    paddingLeft: 24,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-  icon: {
-    marginRight: 10,
-    marginTop: 0,
+  iconContainer: {
+    marginRight: 12,
+    marginTop: 2,
   },
   headerText: {
     flex: 1,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
   title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A202C',
-    marginBottom: 4,
-    letterSpacing: -0.2,
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#0F172A',
+    flex: 1,
   },
   subtitle: {
     fontSize: 13,
-    color: '#4A5568',
-    lineHeight: 18,
+    color: '#64748B',
+    lineHeight: 19,
+    fontWeight: '500',
   },
   aiBox: {
-    backgroundColor: '#F5F7FF',
-    borderRadius: 12,
-    padding: 14,
-    marginTop: 16,
+    backgroundColor: '#F0F7FF',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 18,
   },
   aiHeader: {
     flexDirection: 'row',
@@ -145,19 +162,19 @@ const styles = StyleSheet.create({
   },
   btnRow: {
     flexDirection: 'row',
-    marginTop: 16,
+    marginTop: 20,
     gap: 12,
   },
   btn: {
     flex: 1,
     flexDirection: 'row',
-    paddingVertical: 12,
-    borderRadius: 100,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
   btnCall: {
-    backgroundColor: '#A02B2B',
+    backgroundColor: '#991B1B',
   },
   btnCallText: {
     color: 'white',
@@ -170,7 +187,7 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   btnEscalateText: {
-    color: '#1A202C',
+    color: '#0F172A',
     fontSize: 14,
     fontWeight: '700',
   },

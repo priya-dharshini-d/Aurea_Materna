@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { adminData, ashaData } from '../../constants/MockData';
 import MotherRow from '../../components/MotherRow';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AdminHeatmap() {
   const [selectedVillage, setSelectedVillage] = useState<string | null>(null);
 
   const getStyle = (status: string) => {
-    if (status === 'red') return { bg: Colors.dangerLight, border: Colors.danger, color: Colors.danger, icon: '🔴 Alert' };
-    if (status === 'amber') return { bg: Colors.warningLight, border: Colors.warning, color: Colors.warning, icon: '🟡 Watch' };
-    return { bg: Colors.successLight, border: Colors.success, color: Colors.success, icon: '🟢 Safe' };
+    if (status === 'red') return { bg: '#FCEBEB', border: '#F87171', color: '#991B1B', icon: 'alert-circle', label: 'Alert' };
+    if (status === 'amber') return { bg: '#FFF7ED', border: '#FB923C', color: '#9A3412', icon: 'warning', label: 'Watch' };
+    return { bg: '#F0FDF4', border: '#4ADE80', color: '#166534', icon: 'checkmark-circle', label: 'Safe' };
   };
 
   return (
@@ -31,19 +32,32 @@ export default function AdminHeatmap() {
           return (
             <TouchableOpacity 
               style={[styles.villageCard, { backgroundColor: s.bg, borderColor: s.border }]}
+              activeOpacity={0.8}
               onPress={() => setSelectedVillage(item.name)}
             >
               <Text style={[styles.vName, { color: s.color }]}>{item.name}</Text>
               <Text style={[styles.vCount, { color: s.color }]}>{item.mothers} mothers</Text>
-              <Text style={[styles.vStatus, { color: s.color }]}>{s.icon}</Text>
+              <View style={styles.badge}>
+                <Ionicons name={s.icon as any} size={14} color={s.color} />
+                <Text style={[styles.vStatus, { color: s.color }]}>{s.label}</Text>
+              </View>
             </TouchableOpacity>
           );
         }}
         ListFooterComponent={
           <View style={styles.legend}>
-            <Text style={[styles.legendText, { color: Colors.success }]}>🟢 PPRS 70–100</Text>
-            <Text style={[styles.legendText, { color: Colors.warning }]}>🟡 PPRS 40–69</Text>
-            <Text style={[styles.legendText, { color: Colors.danger }]}>🔴 PPRS 0–39</Text>
+            <View style={styles.legendItem}>
+               <Ionicons name="checkmark-circle" size={16} color="#166534" />
+               <Text style={[styles.legendText, { color: '#166534' }]}>PPRS 70–100</Text>
+            </View>
+            <View style={styles.legendItem}>
+               <Ionicons name="warning" size={16} color="#9A3412" />
+               <Text style={[styles.legendText, { color: '#9A3412' }]}>PPRS 40–69</Text>
+            </View>
+            <View style={styles.legendItem}>
+               <Ionicons name="alert-circle" size={16} color="#991B1B" />
+               <Text style={[styles.legendText, { color: '#991B1B' }]}>PPRS 0–39</Text>
+            </View>
           </View>
         }
       />
@@ -68,19 +82,21 @@ export default function AdminHeatmap() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.surface },
-  header: { padding: 16, paddingBottom: 8 },
-  pageTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary },
-  list: { padding: 12, paddingBottom: 40 },
-  row: { justifyContent: 'space-between', paddingHorizontal: 4, marginBottom: 8 },
-  villageCard: { flex: 0.48, borderWidth: 1, borderRadius: 12, padding: 16, alignItems: 'center' },
-  vName: { fontSize: 13, fontWeight: '700', marginBottom: 4 },
-  vCount: { fontSize: 12, marginBottom: 4 },
-  vStatus: { fontSize: 12, fontWeight: '600' },
-  legend: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 24 },
-  legendText: { fontSize: 11, fontWeight: '600' },
-  modalContainer: { flex: 1, backgroundColor: Colors.bg },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  modalTitle: { fontSize: 18, fontWeight: '700' },
-  closeBtn: { fontSize: 16, color: Colors.primary, fontWeight: '600' }
+  container: { flex: 1, backgroundColor: 'white' },
+  header: { padding: 20, paddingBottom: 10 },
+  pageTitle: { fontSize: 26, fontWeight: '800', color: '#0F172A' },
+  list: { padding: 16, paddingBottom: 40 },
+  row: { justifyContent: 'space-between', marginBottom: 12 },
+  villageCard: { flex: 0.485, borderWidth: 1, borderRadius: 16, padding: 20, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 4 },
+  vName: { fontSize: 15, fontWeight: '800', marginBottom: 4 },
+  vCount: { fontSize: 13, marginBottom: 8, opacity: 0.8 },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  vStatus: { fontSize: 13, fontWeight: '700' },
+  legend: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 16, marginTop: 32, paddingHorizontal: 20 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendText: { fontSize: 12, fontWeight: '700' },
+  modalContainer: { flex: 1, backgroundColor: '#F8FAFC' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#E2E8F0', backgroundColor: 'white' },
+  modalTitle: { fontSize: 20, fontWeight: '800', color: '#0F172A' },
+  closeBtn: { fontSize: 16, color: '#0F172A', fontWeight: '700' }
 });

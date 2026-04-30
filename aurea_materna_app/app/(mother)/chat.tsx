@@ -31,7 +31,7 @@ export default function MotherChat() {
     setInput('');
     
     try {
-      const response = await fetch('http://10.10.193.218:8000/chat', {
+      const response = await fetch('http://localhost:8000/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

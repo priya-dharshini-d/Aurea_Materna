@@ -5,9 +5,11 @@ import { useRouter } from 'expo-router';
 import { Colors } from '../../constants/Colors';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.55;
+const CARD_WIDTH = 220;
+const IMAGE_HEIGHT = 130;
 
 const contentSections = [
+
   {
     title: "Pregnancy-related Conditions",
     items: [
@@ -123,10 +125,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: { 
-    fontSize: 18, 
+    fontSize: 17, 
     fontWeight: '700', 
     color: Colors.textPrimary, 
-    marginBottom: 12,
+    marginBottom: 10,
     paddingHorizontal: 16 
   },
   
@@ -140,10 +142,11 @@ const styles = StyleSheet.create({
   },
   cardImage: { 
     width: '100%', 
-    height: CARD_WIDTH * 0.7, 
+    height: IMAGE_HEIGHT, 
     borderRadius: 12, 
     marginBottom: 8,
-    backgroundColor: Colors.bg 
+    backgroundColor: '#F0F0F0',
+    resizeMode: 'cover'
   },
   cardTitle: { 
     fontSize: 13, 
