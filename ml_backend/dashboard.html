@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aurea Materna – Maternal Health Monitor</title>
+  <meta name="description" content="Real-time maternal health monitoring dashboard with AI risk analysis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ===== RESET & TOKENS ===================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #06060f;
+      --surface:    #0d0d1f;
+      --surface2:   #12122a;
+      --border:     rgba(255,255,255,0.07);
+      --primary:    #a855f7;
+      --primary-glow: rgba(168,85,247,0.35);
+      --accent:     #38bdf8;
+      --green:      #22c55e;
+      --amber:      #f59e0b;
+      --red:        #ef4444;
+      --text:       #e2e8f0;
+      --muted:      #64748b;
+      --radius:     14px;
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ===== ANIMATED BACKGROUND ================================ */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 10%,  rgba(168,85,247,.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 85%,  rgba(56,189,248,.10) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    /* ===== LAYOUT ============================================= */
+    .wrapper {
+      position: relative; z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    /* ===== HEADER ============================================= */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 24px var(--primary-glow);
+    }
+    .logo-text h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem; font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo-text p { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+    .status-badge {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: .82rem;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
+      50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+
+    /* ===== GRID =============================================== */
+    .grid-top {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media(max-width:1024px){ .grid-top { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:600px) { .grid-top { grid-template-columns: 1fr; } }
+
+    .grid-mid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:600px) { .grid-mid { grid-template-columns: 1fr; } }
+
+    .grid-charts {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:900px){ .grid-charts { grid-template-columns: 1fr; } }
+
+    /* ===== CARD =============================================== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      transition: border-color .25s;
+    }
+    .card:hover { border-color: rgba(168,85,247,.3); }
+
+    .card-label {
+      font-size: .75rem; font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .card-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.4rem; font-weight: 700;
+      line-height: 1;
+    }
+    .card-unit {
+      font-size: .9rem; font-weight: 400;
+      color: var(--muted); margin-left: 4px;
+    }
+    .card-sub {
+      font-size: .78rem; color: var(--muted); margin-top: 8px;
+    }
+
+    /* metric accent colours */
+    .metric-bpm   .card-value { color: #f87171; }
+    .metric-temp  .card-value { color: #fb923c; }
+    .metric-ecg   .card-value { color: var(--accent); }
+    .metric-accel .card-value { color: var(--primary); }
+    .metric-spo2  .card-value { color: #34d399; }
+    .metric-bp    .card-value { color: #c084fc; }
+
+    /* ===== RISK CARD ========================================== */
+    .risk-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      gap: 16px;
+      transition: border-color .3s;
+    }
+    .risk-label { font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .risk-ring {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      border: 4px solid;
+      transition: all .4s;
+    }
+    .risk-status {
+      font-size: 1.3rem; font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .risk-desc { font-size: .8rem; color: var(--muted); max-width: 200px; }
+
+    /* ===== CHART CARD ========================================= */
+    .chart-card { position: relative; }
+    .chart-card .card-label { margin-bottom: 18px; }
+    .chart-wrapper { position: relative; height: 220px; }
+
+    /* ===== HISTORY TABLE ====================================== */
+    .history-card { overflow: hidden; }
+    .history-card .card-label { margin-bottom: 16px; }
+    .history-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .history-table th {
+      text-align: left; color: var(--muted);
+      font-weight: 500; padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+    .history-table tbody tr:last-child td { border-bottom: none; }
+    .risk-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: .74rem; font-weight: 600;
+    }
+
+    /* ===== ALERT BANNER ======================================= */
+    #alert-banner {
+      display: none;
+      position: fixed; top: 20px; right: 20px;
+      background: #1c0a0a;
+      border: 1px solid var(--red);
+      border-radius: var(--radius);
+      padding: 16px 22px;
+      box-shadow: 0 0 30px rgba(239,68,68,.4);
+      z-index: 999;
+      animation: slideIn .3s ease;
+      max-width: 320px;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(60px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+    #alert-banner h3 { color: var(--red); font-size: .95rem; margin-bottom: 4px; }
+    #alert-banner p  { color: var(--muted); font-size: .8rem; }
+
+    /* ===== DEMO TAG =========================================== */
+    .demo-tag {
+      display: none;
+      background: rgba(245,158,11,.15);
+      border: 1px solid rgba(245,158,11,.4);
+      border-radius: 99px;
+      padding: 4px 14px;
+      font-size: .75rem; color: var(--amber);
+    }
+    .demo-tag.visible { display: inline-block; }
+
+    /* ===== FOOTER ============================================= */
+    footer { text-align: center; color: var(--muted); font-size: .75rem; margin-top: 32px; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- ── HEADER ──────────────────────────────────────────────── -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🤰</div>
+      <div class="logo-text">
+        <h1>Aurea Materna</h1>
+        <p>Real-time Maternal Health AI Monitor</p>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span class="demo-tag" id="demo-tag">⚡ Demo Mode</span>
+      <div class="status-badge">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── METRIC CARDS ─────────────────────────────────────────── -->
+  <div class="grid-top">
+
+    <div class="card metric-bpm">
+      <div class="card-label">♥ Heart Rate</div>
+      <div class="card-value" id="val-bpm">--<span class="card-unit">bpm</span></div>
+      <div class="card-sub" id="sub-bpm">Awaiting data…</div>
+    </div>
+
+    <div class="card metric-temp">
+      <div class="card-label">🌡 Temperature</div>
+      <div class="card-value" id="val-temp">--<span class="card-unit">°C</span></div>
+      <div class="card-sub" id="sub-temp">Awaiting data…</div>
+    </div>
+
+    <div class="card metric-ecg">
+      <div class="card-label">📈 ECG Value</div>
+      <div class="card-value" id="val-ecg">--<span class="card-unit">raw</span></div>
+      <div class="card-sub">AD8232 analog read (0–4095)</div>
+    </div>
+
+    <div class="card metric-accel">
+      <div class="card-label">🏃 Accelerometer X</div>
+      <div class="card-value" id="val-ax">--<span class="card-unit">LSB</span></div>
+      <div class="card-sub" id="sub-ax">MPU-6050 raw axis</div>
+    </div>
+
+  </div>
+
+  <!-- ── SpO2 + BP ROW ─────────────────────────────────────────── -->
+  <div class="grid-mid">
+
+    <div class="card metric-spo2">
+      <div class="card-label">🩸 SpO2 – Blood Oxygen</div>
+      <div class="card-value" id="val-spo2">--<span class="card-unit">%</span></div>
+      <div class="card-sub" id="sub-spo2">Simulated · Normal: 95–100 %</div>
+    </div>
+
+    <div class="card metric-bp">
+      <div class="card-label">💉 Blood Pressure</div>
+      <div class="card-value" id="val-bp">--<span class="card-unit">mmHg</span></div>
+      <div class="card-sub" id="sub-bp">Simulated · Normal: 90–120 / 60–80</div>
+    </div>
+
+  </div>
+
+  <!-- ── CHARTS + RISK ────────────────────────────────────────── -->
+  <div class="grid-charts">
+
+    <div class="card chart-card">
+      <div class="card-label">📊 Live ECG Waveform</div>
+      <div class="chart-wrapper">
+        <canvas id="ecg-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="risk-card" id="risk-card">
+      <div class="risk-label">AI Risk Assessment</div>
+      <div class="risk-ring" id="risk-ring">🤰</div>
+      <div class="risk-status" id="risk-status">--</div>
+      <div class="risk-desc" id="risk-desc">Collecting sensor data for analysis…</div>
+    </div>
+
+  </div>
+
+  <!-- ── HISTORY ──────────────────────────────────────────────── -->
+  <div class="card history-card">
+    <div class="card-label">📋 Reading Log (latest 10)</div>
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>BPM</th>
+          <th>Temp (°C)</th>
+          <th>SpO2 (%)</th>
+          <th>BP (mmHg)</th>
+          <th>ECG</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody id="history-body">
+        <tr><td colspan="7" style="color:var(--muted);padding:20px 10px;">Awaiting data…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>Aurea Materna &bull; ESP32 + FastAPI + AI &bull; Maternal Health Intelligence</footer>
+</div>
+
+<!-- ── ALERT BANNER ─────────────────────────────────────────────── -->
+<div id="alert-banner">
+  <h3>⚠ High Risk Detected</h3>
+  <p id="alert-msg">Immediate attention recommended.</p>
+</div>
+
+<!-- ── SCRIPTS ──────────────────────────────────────────────────── -->
+<script>
+  const API = 'http://localhost:8000';
+  const SSE = 'http://localhost:8000/stream';
+
+  /* ── ECG Chart ──────────────────────────────────────────────── */
+  const ECG_LEN = 80;
+  const ecgData = Array(ECG_LEN).fill(0);
+  const ecgLabels = Array(ECG_LEN).fill('');
+
+  const ecgCtx = document.getElementById('ecg-chart').getContext('2d');
+  const ecgChart = new Chart(ecgCtx, {
+    type: 'line',
+    data: {
+      labels: ecgLabels,
+      datasets: [{
+        label: 'ECG',
+        data: ecgData,
+        borderColor: '#38bdf8',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.35,
+        fill: true,
+        backgroundColor: 'rgba(56,189,248,0.07)',
+      }]
+    },
+    options: {
+      animation: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#64748b', font: { size: 10 } },
+        }
+      }
+    }
+  });
+
+  /* ── helpers ─────────────────────────────────────────────────── */
+  function pushECG(val) {
+    ecgData.push(val);
+    ecgData.shift();
+    ecgChart.update();
+  }
+
+  function fmtTime(ts) {
+    const d = new Date(ts * 1000);
+    return d.toLocaleTimeString();
+  }
+
+  function riskPill(label, color) {
+    return `<span class="risk-pill" style="background:${color}22;color:${color};border:1px solid ${color}66">${label}</span>`;
+  }
+
+  const historyRows = [];
+  function addHistory(r) {
+    historyRows.unshift(r);
+    if (historyRows.length > 10) historyRows.pop();
+
+    const tbody = document.getElementById('history-body');
+    tbody.innerHTML = historyRows.map(row => `
+      <tr>
+        <td>${fmtTime(row.timestamp)}</td>
+        <td>${row.bpm}</td>
+        <td>${Number(row.temp).toFixed(1)}</td>
+        <td>${Number(row.spo2 ?? 0).toFixed(1)}</td>
+        <td>${row.bp_sys ?? '--'}/${row.bp_dia ?? '--'}</td>
+        <td>${row.ecg}</td>
+        <td>${riskPill(row.prediction.label, row.prediction.color)}</td>
+      </tr>
+    `).join('');
+  }
+
+  /* ── update UI ───────────────────────────────────────────────── */
+  let lastRisk = '';
+
+  function updateUI(data) {
+    // ESP32 metrics
+    document.getElementById('val-bpm').innerHTML  = `${data.bpm}<span class="card-unit">bpm</span>`;
+    document.getElementById('val-temp').innerHTML = `${Number(data.temp).toFixed(1)}<span class="card-unit">°C</span>`;
+    document.getElementById('val-ecg').innerHTML  = `${data.ecg}<span class="card-unit">raw</span>`;
+    document.getElementById('val-ax').innerHTML   = `${data.ax}<span class="card-unit">LSB</span>`;
+
+    // Simulated metrics
+    const spo2   = Number(data.spo2   ?? 98).toFixed(1);
+    const bp_sys = data.bp_sys ?? '--';
+    const bp_dia = data.bp_dia ?? '--';
+    document.getElementById('val-spo2').innerHTML = `${spo2}<span class="card-unit">%</span>`;
+    document.getElementById('val-bp').innerHTML   = `${bp_sys}/<span style="font-size:1.5rem">${bp_dia}</span><span class="card-unit">mmHg</span>`;
+
+    // Sub-texts
+    const b = data.bpm;
+    document.getElementById('sub-bpm').textContent =
+      b > 120 ? '⚠ Tachycardia' : b < 50 ? '⚠ Bradycardia' : '✓ Normal range';
+
+    const t = data.temp;
+    document.getElementById('sub-temp').textContent =
+      t > 39 ? '⚠ High fever' : t > 38 ? '⚠ Mild fever' : '✓ Normal';
+
+    document.getElementById('sub-ax').textContent =
+      Math.abs(data.ax) > 18000 ? '⚠ Sudden movement / fall' : 'Normal activity';
+
+    const s = parseFloat(spo2);
+    document.getElementById('sub-spo2').textContent =
+      s < 94 ? '⚠ Critically low oxygen' : s < 96 ? '⚠ Mildly low' : '✓ Normal (Simulated)';
+
+    const sys = parseInt(bp_sys);
+    const dia = parseInt(bp_dia);
+    document.getElementById('sub-bp').textContent =
+      sys > 140 || dia > 90 ? '⚠ Hypertensive' :
+      sys > 130 || dia > 85 ? '⚠ Elevated' : '✓ Normal (Simulated)';
+
+    // ECG waveform
+    pushECG(data.ecg);
+
+    // Demo tag
+    if (data.demo_mode) {
+      document.getElementById('demo-tag').classList.add('visible');
+    }
+
+    // Risk assessment
+    const pred  = data.prediction || {};
+    const label = pred.label  || '--';
+    const color = pred.color  || '#ffffff';
+
+    document.getElementById('risk-ring').style.borderColor = color;
+    document.getElementById('risk-ring').style.color       = color;
+    document.getElementById('risk-status').textContent     = label;
+    document.getElementById('risk-status').style.color     = color;
+    document.getElementById('risk-card').style.borderColor = color + '55';
+
+    const descs = {
+      'Normal':        'All vitals within expected maternal ranges.',
+      'Moderate Risk': 'Some parameters elevated – monitor closely.',
+      'High Risk':     'Immediate medical attention recommended!',
+    };
+    document.getElementById('risk-desc').textContent = descs[label] || '';
+
+    // Alert banner
+    if (label === 'High Risk' && lastRisk !== 'High Risk') {
+      const banner = document.getElementById('alert-banner');
+      banner.style.display = 'block';
+      document.getElementById('alert-msg').textContent =
+        `T=${Number(data.temp).toFixed(1)}°C  BPM=${data.bpm}  SpO2=${spo2}%  BP=${bp_sys}/${bp_dia}  – Immediate attention recommended.`;
+      setTimeout(() => { banner.style.display = 'none'; }, 6000);
+    }
+    lastRisk = label;
+
+    addHistory(data);
+  }
+
+  /* ── SSE (Server-Sent Events) ────────────────────────────────── */
+  let eventSource;
+
+  function connect() {
+    if (eventSource) {
+      eventSource.close();
+    }
+
+    eventSource = new EventSource(SSE);
+
+    eventSource.onopen = () => {
+      document.getElementById('status-dot').style.background = 'var(--green)';
+      document.getElementById('status-text').textContent = 'Live';
+    };
+
+    eventSource.onmessage = e => {
+      try { updateUI(JSON.parse(e.data)); } catch(_) {}
+    };
+
+    eventSource.onerror = () => {
+      document.getElementById('status-dot').style.background = 'var(--red)';
+      document.getElementById('status-text').textContent = 'Reconnecting…';
+      eventSource.close();
+      setTimeout(connect, 3000);
+    };
+  }
+
+  connect();
+</script>
+</body>
+</html>

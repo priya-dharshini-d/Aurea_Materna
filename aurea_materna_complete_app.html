@@ -278,33 +278,33 @@ svg.wave{width:100%;height:40px}
     </div>
 
     <!-- Risk Circle -->
-    <div class="risk-ring green pulse">
+    <div class="risk-ring green pulse" id="app-risk-ring">
       <div style="font-size:32px">🌿</div>
-      <div class="risk-score" style="color:var(--green600)">82</div>
-      <div class="risk-label" style="color:var(--green600)">Normal</div>
+      <div class="risk-score" style="color:var(--green600)" id="app-risk-score">--</div>
+      <div class="risk-label" style="color:var(--green600)" id="app-risk-label">Normal</div>
     </div>
-    <p style="text-align:center;font-size:12px;color:var(--text2);margin-bottom:16px">Placental Perfusion Risk Score · Updated 4 min ago</p>
+    <p style="text-align:center;font-size:12px;color:var(--text2);margin-bottom:16px" id="app-risk-time">Placental Perfusion Risk Score · Updated just now</p>
 
     <!-- Quick Vitals Grid -->
     <div class="vitals-grid">
       <div class="vital-card">
         <div class="vital-icon">❤️</div>
-        <div class="val-sm">84</div><span class="unit">bpm</span>
+        <div class="val-sm" id="app-val-bpm">--</div><span class="unit">bpm</span>
         <div class="label">Heart Rate</div>
       </div>
       <div class="vital-card">
         <div class="vital-icon">🩸</div>
-        <div class="val-sm">118/76</div>
+        <div class="val-sm" id="app-val-bp">--/--</div>
         <div class="label">Blood Pressure</div>
       </div>
       <div class="vital-card">
         <div class="vital-icon">🫁</div>
-        <div class="val-sm">98%</div><span class="unit">SpO₂</span>
+        <div class="val-sm" id="app-val-spo2">--%</div><span class="unit">SpO₂</span>
         <div class="label">Oxygen Saturation</div>
       </div>
       <div class="vital-card">
         <div class="vital-icon">🌡️</div>
-        <div class="val-sm">36.8°</div><span class="unit">C</span>
+        <div class="val-sm" id="app-val-temp">--°</div><span class="unit">C</span>
         <div class="label">Temperature</div>
       </div>
     </div>
@@ -1534,6 +1534,115 @@ setTimeout(()=>{
 document.querySelectorAll('.toggle:not([onclick])').forEach(t=>{
   t.addEventListener('click',()=>t.classList.toggle('on'));
 });
+
+// --- BACKEND SSE INTEGRATION ---
+const SSE_URL = 'http://localhost:8000/stream';
+let eventSource;
+
+function connectSSE() {
+  if (eventSource) eventSource.close();
+  eventSource = new EventSource(SSE_URL);
+
+  eventSource.onopen = () => {
+    console.log("Connected to Aurea Materna Backend");
+    const offlineBar = document.querySelector('.offline-bar');
+    if (offlineBar) {
+      offlineBar.style.background = 'var(--green50)';
+      offlineBar.style.color = 'var(--green600)';
+      offlineBar.style.borderColor = 'var(--green400)';
+      offlineBar.textContent = 'Backend connected (waiting for data...)';
+    }
+  };
+
+  eventSource.onmessage = e => {
+    try {
+      const data = JSON.parse(e.data);
+      updateAppUI(data);
+    } catch(err) { console.error(err); }
+  };
+
+  eventSource.onerror = () => {
+    eventSource.close();
+    const offlineBar = document.querySelector('.offline-bar');
+    if (offlineBar) {
+      offlineBar.style.background = 'var(--amber50)';
+      offlineBar.style.color = 'var(--amber600)';
+      offlineBar.style.borderColor = 'var(--amber400)';
+      offlineBar.textContent = 'Offline mode active — reconnecting...';
+    }
+    setTimeout(connectSSE, 3000);
+  };
+}
+
+function updateAppUI(data) {
+  // Update offline bar based on demo mode
+  const offlineBar = document.querySelector('.offline-bar');
+  if (offlineBar) {
+    if (data.demo_mode) {
+      offlineBar.style.background = 'var(--amber50)';
+      offlineBar.style.color = 'var(--amber600)';
+      offlineBar.style.borderColor = 'var(--amber400)';
+      offlineBar.textContent = '⚡ DEMO MODE (ESP32 is not sending data)';
+    } else {
+      offlineBar.style.background = 'var(--green50)';
+      offlineBar.style.color = 'var(--green600)';
+      offlineBar.style.borderColor = 'var(--green400)';
+      offlineBar.textContent = '✅ LIVE SENSOR DATA (Connected via WiFi)';
+    }
+  }
+
+  // Update Vitals
+  const bpmEl = document.getElementById('app-val-bpm');
+  const tempEl = document.getElementById('app-val-temp');
+  const spo2El = document.getElementById('app-val-spo2');
+  const bpEl = document.getElementById('app-val-bp');
+  
+  if(bpmEl) bpmEl.textContent = data.bpm;
+  if(tempEl) tempEl.textContent = Number(data.temp).toFixed(1) + '°';
+  if(spo2El) spo2El.textContent = Number(data.spo2 ?? 98).toFixed(1) + '%';
+  if(bpEl) bpEl.textContent = (data.bp_sys ?? '--') + '/' + (data.bp_dia ?? '--');
+
+  // Update Risk Ring
+  const ringEl = document.getElementById('app-risk-ring');
+  const scoreEl = document.getElementById('app-risk-score');
+  const labelEl = document.getElementById('app-risk-label');
+  const timeEl = document.getElementById('app-risk-time');
+
+  if(ringEl && scoreEl && labelEl) {
+    const pred = data.prediction || {};
+    const lvl = pred.risk_level ?? 0;
+    
+    // reset classes
+    ringEl.className = 'risk-ring';
+    
+    if (lvl === 0) {
+      ringEl.classList.add('green');
+      scoreEl.style.color = 'var(--green600)';
+      labelEl.style.color = 'var(--green600)';
+      labelEl.textContent = 'Normal';
+      scoreEl.textContent = '100'; // arbitrary safe score
+    } else if (lvl === 1) {
+      ringEl.classList.add('amber', 'pulse');
+      scoreEl.style.color = 'var(--amber600)';
+      labelEl.style.color = 'var(--amber600)';
+      labelEl.textContent = 'Moderate Risk';
+      scoreEl.textContent = '75';
+    } else {
+      ringEl.classList.add('red', 'blink');
+      scoreEl.style.color = 'var(--red600)';
+      labelEl.style.color = 'var(--red600)';
+      labelEl.textContent = 'High Risk';
+      scoreEl.textContent = '40';
+    }
+  }
+  
+  if (timeEl) {
+    const d = new Date(data.timestamp * 1000);
+    timeEl.textContent = 'Placental Perfusion Risk Score · Updated ' + d.toLocaleTimeString();
+  }
+}
+
+connectSSE();
 </script>
 </body>
 </html>
