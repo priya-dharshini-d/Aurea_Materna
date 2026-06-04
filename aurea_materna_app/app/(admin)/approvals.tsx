@@ -237,7 +237,7 @@ function DetailRow({ label, value, icon }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#E2E8F0' },
-  title: { fontSize: 24, fontWeight: '800', color: '#0F172A' },
+  title: { fontSize: 28, fontWeight: '800', color: '#0F172A' },
   subtitle: { fontSize: 14, color: '#64748B', fontWeight: '600', marginTop: 2 },
   badge: { backgroundColor: '#F1F5F9', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 100 },
   badgeText: { fontSize: 12, fontWeight: '700', color: '#475569' },

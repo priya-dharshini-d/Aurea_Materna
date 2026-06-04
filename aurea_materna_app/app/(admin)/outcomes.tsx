@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BarChart } from 'react-native-chart-kit';
 import { Colors } from '../../constants/Colors';
 import { adminData } from '../../constants/MockData';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,47 +13,21 @@ export default function AdminOutcomes() {
         <Text style={styles.pageTitle}>Clinical Outcomes</Text>
 
         <View style={styles.card}>
-          <BarChart
-            data={{
-              labels: ['Deaths', 'Preterm', 'Avg resp(h)'],
-              datasets: [
-                { data: [3, 29, 18] }, // Before
-              ]
-            }}
-            width={screenWidth}
-            height={200}
-            yAxisLabel=""
-            yAxisSuffix=""
-            chartConfig={{
-              backgroundColor: 'white', backgroundGradientFrom: 'white', backgroundGradientTo: 'white',
-              color: (opacity = 1) => `rgba(136, 135, 128, ${opacity})`,
-              barPercentage: 0.5,
-            }}
-            style={styles.chart}
-          />
-          <BarChart
-            data={{
-              labels: ['Deaths', 'Preterm', 'Avg resp(h)'],
-              datasets: [
-                { data: [0, 18, 4] }, // After
-              ]
-            }}
-            width={screenWidth}
-            height={200}
-            yAxisLabel=""
-            yAxisSuffix=""
-            chartConfig={{
-              backgroundColor: 'white', backgroundGradientFrom: 'white', backgroundGradientTo: 'white',
-              color: (opacity = 1) => `rgba(24, 95, 165, ${opacity})`,
-              barPercentage: 0.5,
-            }}
-            style={[styles.chart, { marginTop: -200, opacity: 0.8 }]} // Overlay to simulate grouped
-          />
+          <Text style={styles.cardTitle}>Clinical Outcomes</Text>
+
+          <OutcomeBar label="Maternal Deaths" before={3} after={0} max={30} beforeColor="#94A3B8" afterColor="#0F6E56" unit="" />
+          <OutcomeBar label="Preterm Births" before={29} after={18} max={30} beforeColor="#94A3B8" afterColor="#0F6E56" unit="" />
+          <OutcomeBar label="Avg Response (h)" before={18} after={4} max={20} beforeColor="#94A3B8" afterColor="#0F6E56" unit="h" />
+
           <View style={styles.legend}>
-            <View style={[styles.legendBox, { backgroundColor: '#888780' }]} />
-            <Text style={styles.legendText}>Before Aurea Materna</Text>
-            <View style={[styles.legendBox, { backgroundColor: Colors.primary, marginLeft: 16 }]} />
-            <Text style={styles.legendText}>After deployment</Text>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendBox, { backgroundColor: '#94A3B8' }]} />
+              <Text style={styles.legendText}>Before Aurea Materna</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendBox, { backgroundColor: '#0F6E56' }]} />
+              <Text style={styles.legendText}>After deployment</Text>
+            </View>
           </View>
         </View>
 
@@ -82,6 +55,28 @@ export default function AdminOutcomes() {
 
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function OutcomeBar({ label, before, after, max, beforeColor, afterColor, unit }: any) {
+  const beforePct = Math.min((before / max) * 100, 100);
+  const afterPct = Math.min((after / max) * 100, 100);
+  return (
+    <View style={styles.outcomeBar}>
+      <Text style={styles.outcomeLabel}>{label}</Text>
+      <View style={styles.barRow}>
+        <Text style={styles.barValue}>{before}{unit}</Text>
+        <View style={styles.barTrack}>
+          <View style={[styles.barFill, { width: `${beforePct}%` as any, backgroundColor: beforeColor }]} />
+        </View>
+      </View>
+      <View style={styles.barRow}>
+        <Text style={[styles.barValue, { color: afterColor }]}>{after}{unit}</Text>
+        <View style={styles.barTrack}>
+          <View style={[styles.barFill, { width: `${afterPct}%` as any, backgroundColor: afterColor }]} />
+        </View>
+      </View>
+    </View>
   );
 }
 
@@ -117,17 +112,26 @@ function ReportCard({ title, sub, icon }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { padding: 16, paddingBottom: 100 },
-  pageTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary, marginBottom: 16, marginTop: 16 },
+  pageTitle: { fontSize: 28, fontWeight: '800', color: '#0F172A', marginBottom: 16, marginTop: 16 },
   card: { backgroundColor: 'white', borderRadius: 20, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
   cardTitle: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary, marginBottom: 16 },
   chart: { marginVertical: 8, borderRadius: 16 },
-  legend: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 16 },
-  legendBox: { width: 12, height: 12, borderRadius: 2, marginRight: 6 },
+  legend: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 16, gap: 16 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendBox: { width: 12, height: 12, borderRadius: 3, marginRight: 4 },
   legendText: { fontSize: 11, color: Colors.textMuted },
   impactRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12 },
   borderBottom: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   impactLabel: { fontSize: 12, color: Colors.textMuted },
   impactPct: { fontSize: 13, color: Colors.success, fontWeight: '600' },
+  
+  // Outcome Bar Styles
+  outcomeBar: { marginBottom: 20 },
+  outcomeLabel: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary, marginBottom: 8 },
+  barRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
+  barValue: { fontSize: 12, fontWeight: '700', color: '#94A3B8', width: 32 },
+  barTrack: { flex: 1, height: 10, backgroundColor: '#F1F5F9', borderRadius: 6, overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: 6 },
   
   // Report Card Styles
   reportCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 20, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },

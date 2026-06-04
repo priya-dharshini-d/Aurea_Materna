@@ -28,24 +28,22 @@ app.get('/api/admin', (req, res) => {
   res.json(adminData);
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`AUREA backend server running on http://localhost:${PORT}`);
-});
-const newMother = req.body;
-if (!newMother.name) {
-  return res.status(400).json({ error: 'Mother name is required' });
-}
+// Register new mother
+app.post('/api/register', (req, res) => {
+  const newMother = req.body;
+  if (!newMother.name) {
+    return res.status(400).json({ error: 'Mother name is required' });
+  }
 
-// Add to the list
-ashaData.mothers = [newMother, ...ashaData.mothers];
-ashaData.totalMothers += 1;
+  // Add to the list
+  ashaData.mothers = [newMother, ...ashaData.mothers];
+  ashaData.totalMothers += 1;
 
-// Sync with doctor patient list (since they share the same array in mock)
-doctorData.patients = ashaData.mothers;
+  // Sync with doctor patient list (since they share the same array in mock)
+  doctorData.patients = ashaData.mothers;
 
-console.log(`New mother registered: ${newMother.name}`);
-res.status(201).json(newMother);
+  console.log(`New mother registered: ${newMother.name}`);
+  res.status(201).json(newMother);
 });
 
 // Update vitals (Mother)

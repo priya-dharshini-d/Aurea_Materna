@@ -48,7 +48,7 @@ export default function AdminDevices() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.surface },
   header: { padding: 16, paddingBottom: 8 },
-  pageTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary },
+  pageTitle: { fontSize: 28, fontWeight: '800', color: '#0F172A' },
   list: { padding: 16, paddingBottom: 40 },
   statRow: { flexDirection: 'row', marginBottom: 16 },
   deviceCard: {

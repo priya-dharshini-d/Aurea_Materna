@@ -34,7 +34,7 @@ export default function Login() {
       // Successful Login
       // Redirect based on role
       const role = data.role;
-      if (role === 'mother') router.push('/(mother)');
+      if (role === 'mother') router.push('/(mother)/connect');
       else if (role === 'asha') router.push('/(asha)');
       else if (role === 'doctor') router.push('/(doctor)');
       else if (role === 'admin') router.push('/(admin)');

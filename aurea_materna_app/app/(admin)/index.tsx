@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StackedBarChart } from 'react-native-chart-kit';
 import { Colors } from '../../constants/Colors';
 import { ActivityIndicator } from 'react-native';
 import StatCard from '../../components/StatCard';
@@ -40,7 +39,6 @@ export default function AdminOverview() {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Home</Text>
-            <Text style={styles.districtSub}>District: {adminData.district} · {adminData.location_village || 'Nallur'}</Text>
           </View>
           
           <View style={{ flexDirection: 'row' }}>
@@ -70,27 +68,19 @@ export default function AdminOverview() {
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>District risk trend (4 weeks)</Text>
-          <StackedBarChart
-            data={{
-              labels: ['W1', 'W2', 'W3', 'W4'],
-              legend: ['Normal', 'Watch', 'High risk'],
-              data: [
+          <View style={{ marginTop: 16 }}>
+            <CustomStackedBars
+              weeks={['W1', 'W2', 'W3', 'W4']}
+              data={[
                 [820, 180, 40],
                 [854, 160, 33],
                 [901, 145, 30],
-                [951, 135, 23]
-              ],
-              barColors: [Colors.success, Colors.warning, Colors.danger]
-            }}
-            width={screenWidth}
-            height={200}
-            chartConfig={{
-              backgroundColor: 'white', backgroundGradientFrom: 'white', backgroundGradientTo: 'white',
-              color: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
-            }}
-            hideLegend={false}
-            style={styles.chart}
-          />
+                [951, 135, 23],
+              ]}
+              colors={['#3B82F6', '#F59E0B', '#EF4444']}
+              labels={['Normal', 'Watch', 'High risk']}
+            />
+          </View>
         </View>
 
         <View style={styles.card}>
@@ -104,6 +94,38 @@ export default function AdminOverview() {
 
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function CustomStackedBars({ weeks, data, colors, labels }: any) {
+  const maxTotal = Math.max(...data.map((d: number[]) => d.reduce((a: number, b: number) => a + b, 0)));
+  return (
+    <View>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', height: 160, marginBottom: 8 }}>
+        {data.map((bars: number[], wi: number) => {
+          const total = bars.reduce((a: number, b: number) => a + b, 0);
+          return (
+            <View key={wi} style={{ alignItems: 'center', flex: 1 }}>
+              <View style={{ width: 36, height: Math.round((total / maxTotal) * 140), borderRadius: 8, overflow: 'hidden', justifyContent: 'flex-end' }}>
+                {[...bars].reverse().map((val: number, si: number) => (
+                  <View key={si} style={{ width: '100%', flex: val, backgroundColor: [...colors].reverse()[si] }} />
+                ))}
+              </View>
+              <Text style={{ fontSize: 11, color: '#94A3B8', marginTop: 6, fontWeight: '600' }}>{weeks[wi]}</Text>
+              <Text style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{total}</Text>
+            </View>
+          );
+        })}
+      </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 8 }}>
+        {labels.map((lbl: string, i: number) => (
+          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <View style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: colors[i] }} />
+            <Text style={{ fontSize: 11, color: '#64748B' }}>{lbl}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
   );
 }
 
